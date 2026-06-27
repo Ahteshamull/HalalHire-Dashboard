@@ -4,13 +4,13 @@ import React, { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Eye, EyeOff, Upload, Loader2, User, Phone, Mail, Lock } from "lucide-react";
+import { Eye, EyeOff, Loader2, User, Phone, Mail, Lock } from "lucide-react";
 import { useCreateAdminMutation } from "@/redux/api/adminApi";
 
 type CreateAdminModalProps = {
   open: boolean;
   onClose: () => void;
-  onConfirm?: (admin: { name: string; email: string; password: string; phoneNumber?: string; avatar?: string }) => void;
+  onConfirm?: (admin: { name: string; email: string; password: string; phoneNumber?: string }) => void;
 };
 
 export default function CreateAdminModal({ open, onClose, onConfirm }: CreateAdminModalProps) {
@@ -21,7 +21,6 @@ export default function CreateAdminModal({ open, onClose, onConfirm }: CreateAdm
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [avatar, setAvatar] = useState<string>("");
   const [errors, setErrors] = useState<{
     name?: string;
     email?: string;
@@ -32,17 +31,6 @@ export default function CreateAdminModal({ open, onClose, onConfirm }: CreateAdm
   
   // API mutation for creating admin
   const [createAdmin, { isLoading }] = useCreateAdminMutation();
-
-  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setAvatar(reader.result as string);
-      };
-      reader.readAsDataURL(file);
-    }
-  };
 
   const validateForm = () => {
     const newErrors: typeof errors = {};
@@ -87,7 +75,6 @@ export default function CreateAdminModal({ open, onClose, onConfirm }: CreateAdm
           email,
           password,
           ...(phoneNumber && { phoneNumber }),
-          ...(avatar && { avatar })
         };
         
         console.log("Sending admin data:", adminData);
@@ -136,7 +123,6 @@ export default function CreateAdminModal({ open, onClose, onConfirm }: CreateAdm
     setPhoneNumber("");
     setPassword("");
     setConfirmPassword("");
-    setAvatar("");
     setErrors({});
     setShowPassword(false);
     setShowConfirmPassword(false);
@@ -292,47 +278,6 @@ export default function CreateAdminModal({ open, onClose, onConfirm }: CreateAdm
             </div>
           </div>
 
-          {/* Profile Image Section */}
-          <div className="space-y-4">
-            <h3 className="text-foreground font-medium">Profile Image (Optional)</h3>
-            <div className="border-border hover:border-primary/50 rounded-lg border-2 border-dashed p-6 text-center transition-colors">
-              <input
-                type="file"
-                id="avatar-upload"
-                accept="image/*"
-                onChange={handleImageUpload}
-                className="hidden"
-              />
-              <label
-                htmlFor="avatar-upload"
-                className="flex cursor-pointer flex-col items-center gap-3"
-              >
-                {avatar ? (
-                  <div className="relative">
-                    <img
-                      src={avatar}
-                      alt="Profile Preview"
-                      className="h-20 w-20 rounded-full object-cover border-2 border-border"
-                    />
-                    <div className="absolute inset-0 flex items-center justify-center rounded-full bg-black/40 opacity-0 transition-opacity hover:opacity-100">
-                      <Upload className="h-5 w-5 text-white" />
-                    </div>
-                    <p className="text-muted-foreground text-xs mt-2">Click to change image</p>
-                  </div>
-                ) : (
-                  <>
-                    <div className="border-border rounded-full border-2 p-4">
-                      <Upload className="text-muted-foreground h-6 w-6" />
-                    </div>
-                    <div>
-                      <p className="text-foreground text-sm font-medium">Upload Profile Image</p>
-                      <p className="text-muted-foreground text-xs">Optional - PNG, JPG up to 5MB</p>
-                    </div>
-                  </>
-                )}
-              </label>
-            </div>
-          </div>
 
           {/* Action Buttons */}
           <div className="flex gap-3 pt-4">

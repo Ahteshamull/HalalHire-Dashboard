@@ -2,7 +2,7 @@
 
 import React from "react";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-import { Search, Eye, Ban, ChevronLeft, ChevronRight, Edit } from "lucide-react";
+import { Search, Eye, Ban, ChevronLeft, ChevronRight, Edit, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import BlockedUsersModal from "../users/BlockedUsersModal";
@@ -10,130 +10,23 @@ import UserDetailsModal from "../users/UserDetailsModal";
 import BlockUserModal from "./BlockUserModal";
 import CreateAdminModal from "./CreateAdminModal";
 import EditAdminModal from "./EditAdminModal";
-import { useGetSingleUserQuery, useGetAllUserQuery } from "@/redux/api/userApi";
+import { useGetSingleUserQuery, useGetAllUserQuery, useDeleteUserMutation } from "@/redux/api/userApi";
 
-const seedAdmins = [
-  {
-    id: "1",
-    name: "Admin John",
-    phone: "123-456-7890",
-    joinedAt: "2023-01-01",
-    email: "admin.john@gmail.com",
-    role: "Super Admin",
-    avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=AdminJohn",
-  },
-  {
-    id: "2",
-    name: "Admin Jane",
-    phone: "987-654-3210",
-    joinedAt: "2023-02-15",
-    email: "admin.jane@email.com",
-    role: "Admin",
-    avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=AdminJane",
-  },
-  {
-    id: "3",
-    name: "Admin Robert",
-    phone: "555-123-4567",
-    joinedAt: "2023-03-10",
-    email: "admin.robert@email.com",
-    role: "Editor",
-    avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=AdminRobert",
-  },
-  {
-    id: "4",
-    name: "Admin Emily",
-    phone: "444-555-6666",
-    joinedAt: "2023-04-20",
-    email: "admin.emily@email.com",
-    role: "Moderator",
-    avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=AdminEmily",
-  },
-  {
-    id: "5",
-    name: "Admin Michael",
-    phone: "222-333-4444",
-    joinedAt: "2023-05-30",
-    email: "admin.michael@email.com",
-    role: "Admin",
-    avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=AdminMichael",
-  },
-  {
-    id: "6",
-    name: "Admin Sarah",
-    phone: "333-444-5555",
-    joinedAt: "2023-06-15",
-    email: "admin.sarah@email.com",
-    role: "Editor",
-    avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=AdminSarah",
-  },
-  {
-    id: "7",
-    name: "Admin David",
-    phone: "666-777-8888",
-    joinedAt: "2023-07-25",
-    email: "admin.david@email.com",
-    role: "Moderator",
-    avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=AdminDavid",
-  },
-  {
-    id: "8",
-    name: "Admin Lisa",
-    phone: "777-888-9999",
-    joinedAt: "2023-08-10",
-    email: "admin.lisa@email.com",
-    role: "Admin",
-    avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=AdminLisa",
-  },
-  {
-    id: "9",
-    name: "Admin Tom",
-    phone: "888-999-0000",
-    joinedAt: "2023-09-05",
-    email: "admin.tom@email.com",
-    role: "Editor",
-    avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=AdminTom",
-  },
-  {
-    id: "10",
-    name: "Admin Anna",
-    phone: "999-000-1111",
-    joinedAt: "2023-10-20",
-    email: "admin.anna@email.com",
-    role: "Moderator",
-    avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=AdminAnna",
-  },
-  {
-    id: "11",
-    name: "Admin Chris",
-    phone: "111-222-3333",
-    joinedAt: "2023-11-12",
-    email: "admin.chris@email.com",
-    role: "Admin",
-    avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=AdminChris",
-  },
-  {
-    id: "12",
-    name: "Admin Maria",
-    phone: "222-333-4444",
-    joinedAt: "2023-12-01",
-    email: "admin.maria@email.com",
-    role: "Editor",
-    avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=AdminMaria",
-  },
-];
+
 
 function AdminsTable({
   admins,
   onViewAdmin,
   onBlockAdmin,
   onEditAdmin,
+  onDeleteAdmin,
   startIndex,
 }: {
   admins: Admin[];
   onViewAdmin: (admin: Admin) => void;
   onBlockAdmin: (admin: Admin) => void;
   onEditAdmin: (admin: Admin) => void;
+  onDeleteAdmin: (admin: Admin) => void;
   startIndex: number;
 }) {
   return (
@@ -226,6 +119,15 @@ function AdminsTable({
                       <Button
                         variant="ghost"
                         size="icon"
+                        className="text-destructive hover:text-destructive hover:bg-destructive/10 h-8 w-8"
+                        onClick={() => onDeleteAdmin(a)}
+                        title="Delete Admin"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="icon"
                         className="text-primary hover:text-primary hover:bg-primary/10 h-8 w-8"
                         onClick={() => onViewAdmin(a)}
                         title="View Details"
@@ -281,6 +183,15 @@ function AdminsTable({
                   title="Block Admin"
                 >
                   <Ban className="h-4 w-4" />
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="text-destructive hover:text-destructive hover:bg-destructive/10 h-8 w-8"
+                  onClick={() => onDeleteAdmin(a)}
+                  title="Delete Admin"
+                >
+                  <Trash2 className="h-4 w-4" />
                 </Button>
                 <Button
                   variant="ghost"
@@ -342,6 +253,9 @@ export default function AdminsPage() {
   const [showCreateAdmin, setShowCreateAdmin] = React.useState(false);
   const [currentPage, setCurrentPage] = React.useState(1);
   const itemsPerPage = 10;
+
+  // Mutation for deleting users/admins
+  const [deleteUser] = useDeleteUserMutation();
 
   // Fetch all users using getAllUser endpoint
   const { data: usersData, isLoading, error } = useGetAllUserQuery({ 
@@ -530,6 +444,18 @@ export default function AdminsPage() {
     setBlockedAdmins((prev) => prev.filter((a) => a._id !== id));
   }
 
+  const handleDeleteAdmin = async (admin: Admin) => {
+    if (window.confirm(`Are you sure you want to delete admin "${admin.name || admin.email}"?`)) {
+      try {
+        await deleteUser(admin._id).unwrap();
+        alert("Admin deleted successfully!");
+      } catch (err: any) {
+        console.error("Delete Admin Error:", err);
+        alert(err?.data?.message || "Failed to delete admin");
+      }
+    }
+  };
+
   function handleCreateAdmin(newAdmin: {
     name: string;
     email: string;
@@ -620,6 +546,7 @@ export default function AdminsPage() {
             onViewAdmin={setSelectedAdmin}
             onBlockAdmin={setBlockAdmin}
             onEditAdmin={setEditingAdmin}
+            onDeleteAdmin={handleDeleteAdmin}
             startIndex={startIndex}
           />
         )}

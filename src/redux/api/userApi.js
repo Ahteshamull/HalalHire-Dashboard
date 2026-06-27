@@ -24,15 +24,6 @@ export const userApi = baseApi.injectEndpoints({
       }),
       providesTags: ["user"],
     }),
-    updateUser: builder.mutation({
-      query: (userId) => {
-        return {
-          url: `/auth/block-user?userId=${userId}`,
-          method: "PATCH",
-        };
-      },
-      invalidatesTags: ["user"],
-    }),
     deleteUser: builder.mutation({
       query: (userId) => ({
         url: `dashboard/delete-user/${userId}`,
@@ -47,6 +38,5 @@ export const userApi = baseApi.injectEndpoints({
 export const {
   useGetAllUserQuery,
   useGetSingleUserQuery,
-  useUpdateUserMutation,
   useDeleteUserMutation,
 } = userApi;

@@ -26,13 +26,13 @@ export const adminApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: ["user"],
     }),
-    // deleteUser: builder.mutation({
-    //   query: (userId) => ({
-    //     url: `/dashboard/delete-user/${userId}`,
-    //     method: "DELETE",
-    //   }),
-    //   invalidatesTags: ["user"],
-    // }),
+    deleteUser: builder.mutation({
+      query: (userId) => ({
+        url: `/dashboard/delete-user/${userId}`,
+        method: "DELETE",
+      }),
+      invalidatesTags: ["user"],
+    }),
     
   }),
 });

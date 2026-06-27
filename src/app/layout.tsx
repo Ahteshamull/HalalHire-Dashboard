@@ -29,7 +29,7 @@ export default async function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={`${poppins.variable} bg-background font-sans antialiased`}>
+      <body suppressHydrationWarning className={`${poppins.variable} bg-background font-sans antialiased`}>
         <ThemeProvider
           attribute="class"
           defaultTheme="light"

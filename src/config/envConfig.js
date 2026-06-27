@@ -1,11 +1,14 @@
 // Function to get the base API URL
-// export const url = "http://10.10.20.57:8001/api/v1/";
-// export const pdfUrl = "http://10.10.20.57:8001";
-// export const imageUrl = "http://10.10.20.57:8001/uploads";
+export const url =
+  "https://totally-carries-mug-permission.trycloudflare.com/api/v1/";
+export const pdfUrl =
+  "https://totally-carries-mug-permission.trycloudflare.com";
+export const imageUrl =
+  "https://totally-carries-mug-permission.trycloudflare.com/uploads";
 
-export const url = "https://charity-spouse-snowboard-reunion.trycloudflare.com/api/v1/";
-export const pdfUrl = "https://charity-spouse-snowboard-reunion.trycloudflare.com";
-export const imageUrl = "https://charity-spouse-snowboard-reunion.trycloudflare.com/uploads";
+// export const url = "/api/v1/";
+// export const pdfUrl = "";
+// export const imageUrl = "/uploads";
 
 export const getBaseUrl = () => {
   return url;
