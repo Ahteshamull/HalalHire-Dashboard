@@ -4,7 +4,7 @@ export const adminApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
     createAdmin: builder.mutation({
       query: (params) => ({
-        url: "/auth/create_admin",
+        url: "/user/create_new_admin",
         method: "POST",
         body: params, // Use body for POST requests
       }),
@@ -19,10 +19,11 @@ export const adminApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: ["user"],
     }),
-    blockUser: builder.mutation({
-      query: (userId) => ({
-        url: `/auth/change_status/${userId}`,
+    blockUserStatus: builder.mutation({
+      query: (data) => ({
+        url: `/auth/change_status/${data.userId}`,
         method: "PATCH",
+        body: { status: data.status },
       }),
       invalidatesTags: ["user"],
     }),
@@ -40,6 +41,6 @@ export const adminApi = baseApi.injectEndpoints({
 export const {
   useCreateAdminMutation,
   useUpdateUserMutation,
-  useBlockUserMutation,
+  useBlockUserStatusMutation,
 //   useDeleteUserMutation,
 } = adminApi;

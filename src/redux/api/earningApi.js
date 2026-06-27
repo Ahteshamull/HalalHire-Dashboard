@@ -13,9 +13,17 @@ const earningApi = baseApi.injectEndpoints({
       }),
       providesTags: ["earning"],
     }),
+    getAllPayments: builder.query({
+      query: (params) => ({
+        url: "payment_gateway/find_by_all_payment",
+        method: "GET",
+        params,
+      }),
+      providesTags: ["earning"],
+    }),
   }),
 });
 
-export const { useGetEarningQuery } = earningApi;
+export const { useGetEarningQuery, useGetAllPaymentsQuery } = earningApi;
 
 export default earningApi;

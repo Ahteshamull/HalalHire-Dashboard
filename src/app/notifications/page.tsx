@@ -1,25 +1,35 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { useNotifications } from "@/context/notification-context";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { useState } from "react";
+import { ChevronLeft, ChevronRight, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-
 import { formatDistanceToNow } from "date-fns";
+import { useGetAllNotificationQuery } from "@/redux/api/notificationApi";
 
 const Notifications = () => {
-  const { notifications, markAllRead } = useNotifications();
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
 
-  const totalPages = Math.ceil((notifications?.length || 0) / itemsPerPage);
-  const startIndex = (currentPage - 1) * itemsPerPage;
-  const endIndex = startIndex + itemsPerPage;
-  const paginatedNotifications = notifications?.slice(startIndex, endIndex) || [];
+  const { data: responseData, isLoading } = useGetAllNotificationQuery({
+    page: currentPage,
+    limit: itemsPerPage,
+  });
 
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [notifications?.length]);
+  const notifications = responseData?.data?.all_notification || [];
+  const meta = responseData?.data?.meta;
+
+  const totalPages = meta?.totalPage || 1;
+  const totalNotifications = meta?.total || 0;
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = Math.min(startIndex + itemsPerPage, totalNotifications);
+
+  if (isLoading) {
+    return (
+      <div className="flex h-64 items-center justify-center">
+        <Loader2 className="text-primary h-8 w-8 animate-spin" />
+      </div>
+    );
+  }
 
   if (!notifications) return null;
 
@@ -30,7 +40,7 @@ const Notifications = () => {
         <Button
           variant="ghost"
           size="sm"
-          onClick={() => markAllRead()}
+          onClick={() => {}}
           className="w-full border border-transparent sm:w-auto dark:border-[#746450]"
         >
           Mark all read
@@ -40,15 +50,17 @@ const Notifications = () => {
       {notifications.length > 0 ? (
         <>
           <div className="space-y-3">
-            {paginatedNotifications.map((notification) => (
+            {notifications.map((notification: any) => (
               <div
-                key={notification.id}
-                className="bg-card text-card-foreground relative rounded-lg border p-4 shadow-sm transition-shadow hover:shadow-md dark:border-[#746450]"
+                key={notification._id}
+                className={`bg-card text-card-foreground relative rounded-lg border p-4 shadow-sm transition-shadow hover:shadow-md dark:border-[#746450] ${
+                  !notification.isRead ? "bg-muted/30" : ""
+                }`}
               >
                 <div className="flex gap-3 sm:gap-4">
-                  {(notification as any).avatar ? (
+                  {notification.avatar ? (
                     <img
-                      src={(notification as any).avatar}
+                      src={notification.avatar}
                       alt="Avatar"
                       className="h-10 w-10 flex-shrink-0 rounded-full object-cover sm:h-12 sm:w-12"
                     />
@@ -57,7 +69,7 @@ const Notifications = () => {
                       {notification.title
                         ? notification.title
                             .split(" ")
-                            .map((s) => s[0])
+                            .map((s: string) => s[0])
                             .slice(0, 2)
                             .join("")
                         : "N"}
@@ -67,13 +79,17 @@ const Notifications = () => {
                     <h3 className="truncate text-sm font-semibold sm:text-base sm:whitespace-normal">
                       {notification.title}
                     </h3>
-                    {notification.body && (
+                    {notification.message && (
                       <p className="text-muted-foreground mt-1 line-clamp-2 text-sm sm:line-clamp-none">
-                        {notification.body}
+                        {notification.message}
                       </p>
                     )}
                     <p className="text-muted-foreground mt-2 text-xs">
-                      {formatDistanceToNow(notification.createdAt, { addSuffix: true })}
+                      {notification.createdAt
+                        ? formatDistanceToNow(new Date(notification.createdAt), {
+                            addSuffix: true,
+                          })
+                        : "Just now"}
                     </p>
                   </div>
                 </div>
@@ -86,8 +102,7 @@ const Notifications = () => {
             <div className="bg-card border-border mt-4 rounded-lg border p-4">
               <div className="flex flex-col items-center justify-between gap-4 sm:flex-row">
                 <div className="text-muted-foreground text-sm">
-                  Showing {startIndex + 1} to {Math.min(endIndex, notifications.length)} of{" "}
-                  {notifications.length} notifications
+                  Showing {startIndex + 1} to {endIndex} of {totalNotifications} notifications
                 </div>
                 <div className="flex items-center gap-2">
                   <Button

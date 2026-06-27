@@ -57,6 +57,14 @@ const authApi = baseApi.injectEndpoints({
 
       invalidatesTags: ["admin"],
     }),
+    getMyProfile: builder.query({
+      query: (params) => ({
+        url: "/auth/myprofile",
+        method: "GET",
+        params,
+      }),
+      providesTags: ["profile"],
+    }),
   }),
 });
 
@@ -68,6 +76,7 @@ export const {
   useResendOtpQuery,
   useLazyResendOtpQuery,
   useChangePasswordMutation,
+  useGetMyProfileQuery,
 } = authApi;
 
 export default authApi;

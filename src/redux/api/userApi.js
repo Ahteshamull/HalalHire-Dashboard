@@ -24,9 +24,9 @@ export const userApi = baseApi.injectEndpoints({
       }),
       providesTags: ["user"],
     }),
-    deleteUser: builder.mutation({
+    deleteUserAccount: builder.mutation({
       query: (userId) => ({
-        url: `dashboard/delete-user/${userId}`,
+        url: `/auth/delete_account/${userId}`,
         method: "DELETE",
       }),
       invalidatesTags: ["user"],
@@ -38,5 +38,5 @@ export const userApi = baseApi.injectEndpoints({
 export const {
   useGetAllUserQuery,
   useGetSingleUserQuery,
-  useDeleteUserMutation,
+  useDeleteUserAccountMutation,
 } = userApi;

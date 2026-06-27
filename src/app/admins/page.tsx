@@ -9,8 +9,8 @@ import BlockedUsersModal from "../users/BlockedUsersModal";
 import UserDetailsModal from "../users/UserDetailsModal";
 import BlockUserModal from "./BlockUserModal";
 import CreateAdminModal from "./CreateAdminModal";
-import EditAdminModal from "./EditAdminModal";
-import { useGetSingleUserQuery, useGetAllUserQuery, useDeleteUserMutation } from "@/redux/api/userApi";
+import { useGetSingleUserQuery, useGetAllUserQuery, useDeleteUserAccountMutation } from "@/redux/api/userApi";
+import Swal from "sweetalert2";
 
 
 
@@ -18,14 +18,13 @@ function AdminsTable({
   admins,
   onViewAdmin,
   onBlockAdmin,
-  onEditAdmin,
+
   onDeleteAdmin,
   startIndex,
 }: {
   admins: Admin[];
   onViewAdmin: (admin: Admin) => void;
   onBlockAdmin: (admin: Admin) => void;
-  onEditAdmin: (admin: Admin) => void;
   onDeleteAdmin: (admin: Admin) => void;
   startIndex: number;
 }) {
@@ -101,15 +100,6 @@ function AdminsTable({
                       <Button
                         variant="ghost"
                         size="icon"
-                        className="text-primary hover:text-primary hover:bg-primary/10 h-8 w-8"
-                        onClick={() => onEditAdmin(a)}
-                        title="Edit Admin"
-                      >
-                        <Edit className="h-4 w-4" />
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="icon"
                         className="text-destructive hover:text-destructive hover:bg-destructive/10 h-8 w-8"
                         onClick={() => onBlockAdmin(a)}
                         title="Block Admin"
@@ -166,15 +156,6 @@ function AdminsTable({
                 </div>
               </div>
               <div className="flex flex-shrink-0 gap-2">
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="text-primary hover:text-primary hover:bg-primary/10 h-8 w-8"
-                  onClick={() => onEditAdmin(a)}
-                  title="Edit Admin"
-                >
-                  <Edit className="h-4 w-4" />
-                </Button>
                 <Button
                   variant="ghost"
                   size="icon"
@@ -248,14 +229,13 @@ export default function AdminsPage() {
   const [query, setQuery] = React.useState("");
   const [selectedAdmin, setSelectedAdmin] = React.useState<Admin | null>(null);
   const [blockAdmin, setBlockAdmin] = React.useState<Admin | null>(null);
-  const [editingAdmin, setEditingAdmin] = React.useState<Admin | null>(null);
   const [showBlockedAdmins, setShowBlockedAdmins] = React.useState(false);
   const [showCreateAdmin, setShowCreateAdmin] = React.useState(false);
   const [currentPage, setCurrentPage] = React.useState(1);
   const itemsPerPage = 10;
 
   // Mutation for deleting users/admins
-  const [deleteUser] = useDeleteUserMutation();
+  const [deleteUser] = useDeleteUserAccountMutation();
 
   // Fetch all users using getAllUser endpoint
   const { data: usersData, isLoading, error } = useGetAllUserQuery({ 
@@ -445,13 +425,31 @@ export default function AdminsPage() {
   }
 
   const handleDeleteAdmin = async (admin: Admin) => {
-    if (window.confirm(`Are you sure you want to delete admin "${admin.name || admin.email}"?`)) {
+    const result = await Swal.fire({
+      title: "Are you sure?",
+      text: `Do you really want to delete admin "${admin.name || admin.email}"?`,
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#d33",
+      cancelButtonColor: "#3085d6",
+      confirmButtonText: "Yes, delete it!"
+    });
+
+    if (result.isConfirmed) {
       try {
         await deleteUser(admin._id).unwrap();
-        alert("Admin deleted successfully!");
+        Swal.fire({
+          icon: "success",
+          title: "Deleted!",
+          text: "Admin deleted successfully!",
+        });
       } catch (err: any) {
         console.error("Delete Admin Error:", err);
-        alert(err?.data?.message || "Failed to delete admin");
+        Swal.fire({
+          icon: "error",
+          title: "Error",
+          text: err?.data?.message || "Failed to delete admin",
+        });
       }
     }
   };
@@ -472,22 +470,6 @@ export default function AdminsPage() {
       photo: newAdmin.avatar || `https://api.dicebear.com/7.x/avataaars/svg?seed=${newAdmin.name}`, // Changed avatar to photo
     };
     // setAdmins((prev) => [admin, ...prev]);
-  }
-
-  function handleUpdateAdmin(updatedAdmin: {
-    name: string;
-    email: string;
-    role: string;
-    avatar?: string;
-  }) {
-    if (editingAdmin) {
-      /*
-      setAdmins((prev) =>
-        prev.map((a) => (a._id === editingAdmin._id ? { ...a, ...updatedAdmin } : a)),
-      );
-      */
-      setEditingAdmin(null);
-    }
   }
 
   return (
@@ -545,7 +527,6 @@ export default function AdminsPage() {
             admins={paginatedAdmins}
             onViewAdmin={setSelectedAdmin}
             onBlockAdmin={setBlockAdmin}
-            onEditAdmin={setEditingAdmin}
             onDeleteAdmin={handleDeleteAdmin}
             startIndex={startIndex}
           />
@@ -624,7 +605,7 @@ export default function AdminsPage() {
         open={!!blockAdmin}
         onClose={() => setBlockAdmin(null)}
         user={blockAdmin ? {
-          id: blockAdmin._id,
+          id: blockAdmin._id || (blockAdmin as any).id,
           name: blockAdmin.name || 'Unknown',
           email: blockAdmin.email,
           avatar: blockAdmin.photo || '',
@@ -654,20 +635,6 @@ export default function AdminsPage() {
         open={showCreateAdmin}
         onClose={() => setShowCreateAdmin(false)}
         onConfirm={handleCreateAdmin}
-      />
-
-      {/* Edit Admin Modal */}
-      <EditAdminModal
-        open={!!editingAdmin}
-        onClose={() => setEditingAdmin(null)}
-        onConfirm={handleUpdateAdmin}
-        admin={editingAdmin ? {
-          _id: editingAdmin._id,
-          name: editingAdmin.name || 'Unknown',
-          email: editingAdmin.email,
-          role: editingAdmin.role,
-          avatar: editingAdmin.photo || ''
-        } : null}
       />
     </div>
   );

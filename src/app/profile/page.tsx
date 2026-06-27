@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { useUpdateUserMutation } from "@/redux/api/adminApi";
 import { useGetUserProfileQuery } from "@/redux/api/profileApi";
+import Swal from "sweetalert2";
 import { useSelector } from "react-redux";
 import { store } from "@/redux/store";
 
@@ -220,13 +221,21 @@ export default function ProfilePage() {
         console.log("Updating profile:", profileData);
         // Use the actual user ID from the profile
         const userId = userProfile?.data?._id || "current-user";
-        await updateProfile({ userId, ...profileData }).unwrap();
+        const res = await updateProfile({ userId, ...profileData }).unwrap();
         
-        alert("Profile updated successfully!");
+        Swal.fire({
+          icon: "success",
+          title: "Success",
+          text: res.message || res?.data?.message || "Profile updated successfully!",
+        });
       } catch (err: any) {
         console.error("Profile Update Error:", err);
         const errorMessage = err?.data?.message || "Failed to update profile. Please try again.";
-        alert(errorMessage);
+        Swal.fire({
+          icon: "error",
+          title: "Error",
+          text: errorMessage,
+        });
       }
     }
   };

@@ -4,8 +4,10 @@ import React, { useState, useEffect } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Eye, EyeOff, Upload, Loader2, User, Mail, Shield } from "lucide-react";
+import { Eye, EyeOff, Upload, Loader2, User, Mail, Shield, Phone } from "lucide-react";
 import { useUpdateUserMutation } from "@/redux/api/adminApi";
+import { useGetMyProfileQuery } from "@/redux/api/authApi";
+import Swal from "sweetalert2";
 
 type EditAdminModalProps = {
   open: boolean;
@@ -17,6 +19,7 @@ type EditAdminModalProps = {
     email: string;
     role: string;
     avatar?: string;
+    phoneNumber?: string;
   } | null;
 };
 
@@ -25,6 +28,7 @@ export default function EditAdminModal({ open, onClose, onConfirm, admin }: Edit
   const [email, setEmail] = useState("");
   const [role, setRole] = useState("");
   const [avatar, setAvatar] = useState<string>("");
+  const [phoneNumber, setPhoneNumber] = useState("");
   const [errors, setErrors] = useState<{
     name?: string;
     role?: string;
@@ -32,16 +36,26 @@ export default function EditAdminModal({ open, onClose, onConfirm, admin }: Edit
   
   // API mutation for updating admin
   const [updateAdmin, { isLoading }] = useUpdateUserMutation();
+  const { data: myProfile } = useGetMyProfileQuery(undefined, { skip: !open && !admin });
 
   useEffect(() => {
-    if (open && admin) {
-      setName(admin.name || "");
-      setEmail(admin.email);
-      setRole(admin.role);
-      setAvatar(admin.avatar || "");
+    if (open) {
+      if (admin) {
+        setName(admin.name || "");
+        setEmail(admin.email);
+        setRole(admin.role);
+        setAvatar(admin.avatar || "");
+        setPhoneNumber(admin.phoneNumber || "");
+      } else if (myProfile?.data) {
+        setName(myProfile.data.name || "");
+        setEmail(myProfile.data.email || "");
+        setRole(myProfile.data.role || "");
+        setAvatar(myProfile.data.photo || "");
+        setPhoneNumber(myProfile.data.phoneNumber || "");
+      }
       setErrors({});
     }
-  }, [open, admin]);
+  }, [open, admin, myProfile]);
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -77,10 +91,11 @@ export default function EditAdminModal({ open, onClose, onConfirm, admin }: Edit
         const adminData = {
           name,
           role,
+          phoneNumber,
           ...(avatar && { avatar })
         };
         
-        await updateAdmin({ userId: admin._id, ...adminData }).unwrap();
+        const res = await updateAdmin({ userId: admin._id, ...adminData }).unwrap();
         
         // Call onConfirm if provided
         if (onConfirm) {
@@ -93,11 +108,19 @@ export default function EditAdminModal({ open, onClose, onConfirm, admin }: Edit
         }
         
         onClose();
-        alert("Admin updated successfully!");
+        Swal.fire({
+          icon: "success",
+          title: "Success",
+          text: res.message || res?.data?.message || "Profile updated successfully!",
+        });
       } catch (err: any) {
         console.error("Update Admin Error:", err);
         const errorMessage = err?.data?.message || "Failed to update admin. Please try again.";
-        alert(errorMessage);
+        Swal.fire({
+          icon: "error",
+          title: "Error",
+          text: errorMessage,
+        });
       }
     }
   };
@@ -134,6 +157,21 @@ export default function EditAdminModal({ open, onClose, onConfirm, admin }: Edit
                 className={errors.name ? "border-destructive" : ""}
               />
               {errors.name && <p className="text-destructive text-xs">{errors.name}</p>}
+            </div>
+
+            {/* Phone Number */}
+            <div className="space-y-2">
+              <label htmlFor="phoneNumber" className="text-foreground text-sm font-medium flex items-center gap-2">
+                <Phone className="h-4 w-4" />
+                Phone Number
+              </label>
+              <Input
+                id="phoneNumber"
+                type="text"
+                placeholder="+8801722305054"
+                value={phoneNumber}
+                onChange={(e) => setPhoneNumber(e.target.value)}
+              />
             </div>
 
             {/* Email (Read-only) */}

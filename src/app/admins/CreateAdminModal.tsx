@@ -6,17 +6,19 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Eye, EyeOff, Loader2, User, Phone, Mail, Lock } from "lucide-react";
 import { useCreateAdminMutation } from "@/redux/api/adminApi";
+import Swal from "sweetalert2";
 
 type CreateAdminModalProps = {
   open: boolean;
   onClose: () => void;
-  onConfirm?: (admin: { name: string; email: string; password: string; phoneNumber?: string }) => void;
+  onConfirm?: (admin: { name: string; email: string; password: string; role: string; phoneNumber?: string }) => void;
 };
 
 export default function CreateAdminModal({ open, onClose, onConfirm }: CreateAdminModalProps) {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
+  const [role, setRole] = useState("admin");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -25,6 +27,7 @@ export default function CreateAdminModal({ open, onClose, onConfirm }: CreateAdm
     name?: string;
     email?: string;
     phoneNumber?: string;
+    role?: string;
     password?: string;
     confirmPassword?: string;
   }>({});
@@ -74,6 +77,7 @@ export default function CreateAdminModal({ open, onClose, onConfirm }: CreateAdm
           name,
           email,
           password,
+          role,
           ...(phoneNumber && { phoneNumber }),
         };
         
@@ -87,7 +91,11 @@ export default function CreateAdminModal({ open, onClose, onConfirm }: CreateAdm
         }
         
         handleClose();
-        alert("Admin created successfully!");
+        Swal.fire({
+          icon: "success",
+          title: "Success",
+          text: result?.message || result?.data?.message || "Admin created successfully!",
+        });
       } catch (err: any) {
         console.error("Create Admin Error:", err);
         console.error("Error status:", err?.status);
@@ -112,7 +120,11 @@ export default function CreateAdminModal({ open, onClose, onConfirm }: CreateAdm
           errorMessage = err;
         }
         
-        alert(errorMessage);
+        Swal.fire({
+          icon: "error",
+          title: "Error",
+          text: errorMessage,
+        });
       }
     }
   };
@@ -121,6 +133,7 @@ export default function CreateAdminModal({ open, onClose, onConfirm }: CreateAdm
     setName("");
     setEmail("");
     setPhoneNumber("");
+    setRole("admin");
     setPassword("");
     setConfirmPassword("");
     setErrors({});
@@ -202,6 +215,33 @@ export default function CreateAdminModal({ open, onClose, onConfirm }: CreateAdm
                 className={errors.email ? "border-destructive" : ""}
               />
               {errors.email && <p className="text-destructive text-xs">{errors.email}</p>}
+            </div>
+
+            {/* Role */}
+            <div className="space-y-2">
+              <label htmlFor="role" className="text-foreground text-sm font-medium">
+                Role *
+              </label>
+              <div className="relative">
+                <select
+                  id="role"
+                  value={role}
+                  onChange={(e) => {
+                    setRole(e.target.value);
+                    if (errors.role) setErrors({ ...errors, role: undefined });
+                  }}
+                  className={`border-input bg-background ring-offset-background placeholder:text-muted-foreground focus:ring-ring flex h-10 w-full items-center justify-between rounded-md border px-3 py-2 text-sm focus:ring-2 focus:ring-offset-2 focus:outline-none ${
+                    errors.role ? "border-destructive" : ""
+                  }`}
+                >
+                  <option value="" disabled>Select a role</option>
+                  <option value="superAdmin">Super Admin</option>
+                  <option value="admin">Admin</option>
+                  <option value="editor">Editor</option>
+                  <option value="moderator">Moderator</option>
+                </select>
+              </div>
+              {errors.role && <p className="text-destructive text-xs">{errors.role}</p>}
             </div>
           </div>
 

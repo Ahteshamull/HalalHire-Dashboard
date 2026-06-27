@@ -353,10 +353,11 @@ export default function RecentUser() {
         onClose={() => setBlockUser(null)}
         onConfirm={handleBlockConfirm}
         user={blockUser ? {
-          id: blockUser._id,
+          id: blockUser._id || (blockUser as any).id,
           name: getDisplayName(blockUser),
           email: blockUser.email,
-          avatar: getDisplayAvatar(blockUser)
+          avatar: getDisplayAvatar(blockUser),
+          status: blockUser.status
         } : null}
       />
     </div>

@@ -3,7 +3,8 @@
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { useBlockUserMutation } from "@/redux/api/adminApi";
+import { useBlockUserStatusMutation } from "@/redux/api/adminApi";
+import Swal from "sweetalert2";
 
 interface User {
   id: string;
@@ -21,13 +22,14 @@ interface BlockUserModalProps {
 }
 
 export default function BlockUserModal({ open, onClose, user, onConfirm }: BlockUserModalProps) {
-  const [blockUser, { isLoading }] = useBlockUserMutation();
+  const [blockUser, { isLoading }] = useBlockUserStatusMutation();
   
   if (!user) return null;
 
   const handleBlockConfirm = async () => {
     try {
-      await blockUser(user.id).unwrap();
+      const newStatus = user.status === 'blocked' ? 'isProgress' : 'blocked';
+      const res = await blockUser({ userId: user.id, status: newStatus }).unwrap();
       
       // Call onConfirm if provided
       if (onConfirm) {
@@ -35,11 +37,19 @@ export default function BlockUserModal({ open, onClose, user, onConfirm }: Block
       }
       
       onClose();
-      alert("User status updated successfully!");
+      Swal.fire({
+        icon: "success",
+        title: "Success",
+        text: res?.message || res?.data?.message || "User status updated successfully!",
+      });
     } catch (err: any) {
       console.error("Block User Error:", err);
       const errorMessage = err?.data?.message || "Failed to update user status. Please try again.";
-      alert(errorMessage);
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: errorMessage,
+      });
     }
   };
 

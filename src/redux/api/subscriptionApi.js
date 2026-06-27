@@ -10,12 +10,17 @@ const subscriptionApi = baseApi.injectEndpoints({
       }),
       providesTags: ["subscription"],
     }),
-    updateSubscriptionPlan: builder.mutation({
-      query: ({ subscriptionId, role, data }) => ({
-        url: "subscription/update-subscription-plan",
+    getSubscription: builder.query({
+      query: () => ({
+        url: "subscription/find_subscription",
+        method: "GET",
+      }),
+      providesTags: ["subscription"],
+    }),
+    updateSubscriptionPricing: builder.mutation({
+      query: (data) => ({
+        url: "subscription/update_subscription_pricing",
         method: "PATCH",
-        // Send both casings to be safe
-        params: { subscriptionId, role },
         body: data,
       }),
       invalidatesTags: ["subscription"],
@@ -23,6 +28,6 @@ const subscriptionApi = baseApi.injectEndpoints({
   }),
 });
 
-export const { useGetSubscriptionPlansQuery, useUpdateSubscriptionPlanMutation } = subscriptionApi;
+export const { useGetSubscriptionPlansQuery, useGetSubscriptionQuery, useUpdateSubscriptionPricingMutation } = subscriptionApi;
 
 export default subscriptionApi;

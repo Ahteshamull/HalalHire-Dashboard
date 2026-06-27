@@ -51,6 +51,11 @@ const items = [
     icon: User,
   },
   {
+    title: "Subscription",
+    url: "/subscription",
+    icon: Podcast,
+  },
+  {
     title: "Earnings",
     url: "/earnings",
     icon: Wallet,
@@ -65,11 +70,7 @@ const items = [
   //   url: "/products",
   //   icon: PackageSearch,
   // },
-  // {
-  //   title: "Subscription",
-  //   url: "/subscription",
-  //   icon: Podcast,
-  // },
+
   // {
   //   title: "Blog",
   //   url: "/blogs",

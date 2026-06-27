@@ -16,32 +16,45 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart";
+import { useGetPaymentGrowthQuery } from "@/redux/api/dashboardApi";
+import { useMemo } from "react";
 
 export const description = "A linear area chart";
 
-const chartData = [
-  { month: "January", desktop: 186 },
-  { month: "February", desktop: 305 },
-  { month: "March", desktop: 237 },
-  { month: "April", desktop: 73 },
-  { month: "May", desktop: 209 },
-  { month: "June", desktop: 214 },
-  { month: "July", desktop: 278 },
-  { month: "August", desktop: 189 },
-  { month: "September", desktop: 239 },
-  { month: "October", desktop: 349 },
-  { month: "November", desktop: 295 },
-  { month: "December", desktop: 412 },
+const monthNames = [
+  "January", "February", "March", "April", "May", "June",
+  "July", "August", "September", "October", "November", "December"
 ];
 
 const chartConfig = {
-  desktop: {
+  count: {
     label: "Earnings",
     color: "var(--chart-1)",
   },
 } satisfies ChartConfig;
 
 export function EarningChart() {
+  const { data: response, isLoading } = useGetPaymentGrowthQuery({ year: new Date().getFullYear() });
+
+  const chartData = useMemo(() => {
+    if (!response?.data?.monthlyStats) return [];
+    
+    return response.data.monthlyStats.map((stat: any) => ({
+      month: monthNames[stat.month - 1] || `Month ${stat.month}`,
+      count: stat.count,
+    }));
+  }, [response]);
+
+  const yearlyGrowth = response?.data?.yearlyGrowth || 0;
+
+  if (isLoading) {
+    return (
+      <Card className="flex h-full min-h-[300px] items-center justify-center dark:border-[#F4B057]">
+        <div className="text-sm text-[#0D2357] dark:text-white">Loading chart data...</div>
+      </Card>
+    );
+  }
+
   return (
     <Card className="h-full dark:border-[#F4B057]">
       <CardHeader className="p-4 sm:p-6">
@@ -56,7 +69,7 @@ export function EarningChart() {
             <div className="grid gap-2">
               <div className="flex items-center gap-2 leading-none font-medium">
                 <TrendingUp className="h-4 w-4" />
-                Trending up by 5.2% this month
+                Trending up by {yearlyGrowth}% this year
               </div>
             </div>
           </div>
@@ -85,11 +98,11 @@ export function EarningChart() {
               content={<ChartTooltipContent indicator="dot" hideLabel />}
             />
             <Area
-              dataKey="desktop"
+              dataKey="count"
               type="linear"
-              fill="var(--color-desktop)"
+              fill="var(--color-count)"
               fillOpacity={0.4}
-              stroke="var(--color-desktop)"
+              stroke="var(--color-count)"
             />
           </AreaChart>
         </ChartContainer>

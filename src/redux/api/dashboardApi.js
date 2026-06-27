@@ -20,9 +20,17 @@ const dashboardApi = baseApi.injectEndpoints({
       }),
       providesTags: ["dashboard"],
     }),
+    getPaymentGrowth: builder.query({
+      query: (params) => ({
+        url: "payment_gateway/payment_growth",
+        method: "GET",
+        params,
+      }),
+      providesTags: ["dashboard"],
+    }),
   }),
 });
 
-export const { useGetAllDashboardQuery, useGetUserGrowthQuery } = dashboardApi;
+export const { useGetAllDashboardQuery, useGetUserGrowthQuery, useGetPaymentGrowthQuery } = dashboardApi;
 
 export default dashboardApi;
