@@ -106,7 +106,7 @@ export default function ResetPasswordPage() {
           {/* Logo */}
           <div className="mb-8 flex flex-col items-center">
             <div className="mb-4 flex h-20 w-20 items-center justify-center">
-              <Image
+              <img
                 src="/logo.png"
                 alt="Logo"
                 width={80}
