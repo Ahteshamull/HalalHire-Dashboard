@@ -1,18 +1,25 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { ArrowLeft, Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import TiptapEditor from "@/components/ui/TiptapEditor";
-import { useCreatePrivacyMutation } from "@/redux/api/privacyApi";
+import { useCreatePrivacyMutation, useGetPrivacyQuery } from "@/redux/api/privacyApi";
+import Swal from "sweetalert2";
 
 export default function PrivacyPolicyPage() {
   const router = useRouter();
-  const [createPrivacy, { isLoading }] = useCreatePrivacyMutation();
-  const [content, setContent] = useState(
-    "<p>Your privacy is important to us. This privacy policy explains how we collect, use, and protect your personal information.</p>",
-  );
+  const [createPrivacy, { isLoading: isCreating }] = useCreatePrivacyMutation();
+  const { data: privacyData, isLoading: isFetching } = useGetPrivacyQuery({});
+  
+  const [content, setContent] = useState("");
+
+  useEffect(() => {
+    if (privacyData?.data?.PrivacyPolicy) {
+      setContent(privacyData.data.PrivacyPolicy);
+    }
+  }, [privacyData]);
 
   const handleSave = async () => {
     try {
@@ -22,11 +29,11 @@ export default function PrivacyPolicyPage() {
         },
       }).unwrap();
       
-      alert("Privacy Policy saved successfully!");
+      Swal.fire("Success", "Privacy Policy saved successfully!", "success");
     } catch (err: any) {
       console.error("Save Privacy Policy Error:", err);
       const errorMessage = err?.data?.message || "Failed to save Privacy Policy. Please try again.";
-      alert(errorMessage);
+      Swal.fire("Error", errorMessage, "error");
     }
   };
 
@@ -44,11 +51,17 @@ export default function PrivacyPolicyPage() {
 
       {/* Editor */}
       <div className="bg-card p-6">
-        <TiptapEditor
-          content={content}
-          onChange={setContent}
-          placeholder="Write privacy policy..."
-        />
+        {isFetching ? (
+          <div className="flex h-[300px] items-center justify-center">
+            <Loader2 className="h-8 w-8 animate-spin text-primary" />
+          </div>
+        ) : (
+          <TiptapEditor
+            content={content}
+            onChange={setContent}
+            placeholder="Write privacy policy..."
+          />
+        )}
       </div>
 
       {/* Footer Actions */}
@@ -56,9 +69,9 @@ export default function PrivacyPolicyPage() {
         <Button
           onClick={handleSave}
           className="bg-primary hover:bg-primary/90 text-primary-foreground w-full sm:w-auto"
-          disabled={isLoading}
+          disabled={isCreating || isFetching}
         >
-          {isLoading ? (
+          {isCreating ? (
             <>
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
               Saving...

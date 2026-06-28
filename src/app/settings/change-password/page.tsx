@@ -1,10 +1,12 @@
 "use client";
 
 import { useState } from "react";
-import { ArrowLeft, Eye, EyeOff } from "lucide-react";
+import { ArrowLeft, Eye, EyeOff, Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { useChangePasswordMutation } from "@/redux/api/userApi";
+import Swal from "sweetalert2";
 
 export default function ChangePasswordPage() {
   const router = useRouter();
@@ -20,7 +22,9 @@ export default function ChangePasswordPage() {
     confirmPassword?: string;
   }>({});
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const [changePassword, { isLoading }] = useChangePasswordMutation();
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const newErrors: typeof errors = {};
 
@@ -43,9 +47,21 @@ export default function ChangePasswordPage() {
     setErrors(newErrors);
 
     if (Object.keys(newErrors).length === 0) {
-      // Handle password change
-      alert("Password changed successfully!");
-      router.push("/settings");
+      try {
+        const res = await changePassword({
+          oldPassword: currentPassword,
+          newPassword: newPassword,
+        }).unwrap();
+
+        if (res.success) {
+          Swal.fire("Success", "Password changed successfully!", "success");
+          router.push("/settings");
+        } else {
+          Swal.fire("Error", res.message || "Failed to change password", "error");
+        }
+      } catch (error: any) {
+        Swal.fire("Error", error?.data?.message || "Something went wrong", "error");
+      }
     }
   };
 
@@ -155,9 +171,10 @@ export default function ChangePasswordPage() {
           {/* Submit Button */}
           <Button
             type="submit"
-            className="bg-primary hover:bg-primary/90 text-primary-foreground h-12 w-full text-base"
+            disabled={isLoading}
+            className="bg-primary hover:bg-primary/90 text-primary-foreground flex h-12 w-full items-center justify-center gap-2 text-base"
           >
-            Save Changes
+            {isLoading ? <Loader2 className="h-5 w-5 animate-spin" /> : "Save Changes"}
           </Button>
         </form>
       </div>
