@@ -1,0 +1,43 @@
+HALALHIRE PROJECT FLOW
+===================================
+
+1. SYSTEM ARCHITECTURE
+-----------------------------------
+- Frontend (Next.js): Job Seekers & Companies interface.
+- Dashboard (Next.js): Administrator panel.
+- Backend (Node.js/Express): Central REST API & Socket.io server.
+- Database: MongoDB.
+
+2. USER JOURNEY FLOW (FRONTEND)
+-----------------------------------
+Step 1: Registration & Onboarding
+- A Visitor lands on the Home Page and clicks 'Sign Up'.
+- They choose a role: 'Job Seeker' (Individual) or 'Company'.
+- The user fills out their respective profiles (verifying identity, uploading documents, etc.).
+
+Step 2: Job Creation (Companies)
+- A verified Company logs in and navigates to 'Post a Job'.
+- They enter details (including specific Islamic workplace ethics like halal food or prayer room access).
+- The job is published to the public '/jobs' board.
+
+Step 3: Job Application (Job Seekers)
+- A Job Seeker searches the '/jobs' board.
+- They find a suitable job and click 'Apply'.
+- The Backend processes the application and triggers a real-time Socket.io notification to the Company.
+
+3. ADMIN MANAGEMENT FLOW (DASHBOARD)
+-----------------------------------
+Step 1: Verification & Monitoring
+- An Admin logs into the Dashboard.
+- The Admin reviews new Company registrations.
+- If the company meets Islamic ethical standards, the Admin grants them the "Halal Verified" badge.
+- Admins can block or manage abusive users from the Users Table.
+
+Step 2: Support & Contact
+- A user on the Frontend submits a 'Contact Us' ticket.
+- The Admin receives a notification in the Dashboard.
+- The Admin reviews the message in the Contact Table, resolves the issue, and deletes the ticket.
+
+Step 3: Subscriptions
+- Companies purchase premium subscription plans via the Frontend to post more jobs.
+- The Admin tracks active plans, revenue, and billing histories via the Subscriptions tab.

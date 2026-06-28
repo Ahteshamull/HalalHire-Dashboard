@@ -109,8 +109,10 @@ export default function ContactPage() {
         ) : filteredContacts.length === 0 ? (
           <div className="p-8 text-center text-muted-foreground">No contacts found.</div>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="min-w-full">
+          <>
+            {/* Desktop Table View */}
+            <div className="hidden md:block overflow-x-auto">
+              <table className="min-w-full">
               <thead className="bg-muted/50">
                 <tr>
                   <th className="text-muted-foreground px-6 py-4 text-left text-xs font-medium tracking-wider uppercase">Name</th>
@@ -154,8 +156,49 @@ export default function ContactPage() {
                   </tr>
                 ))}
               </tbody>
-            </table>
-          </div>
+              </table>
+            </div>
+
+            {/* Mobile/Tablet Card View */}
+            <div className="space-y-4 p-4 md:hidden bg-muted/10">
+              {filteredContacts.map((c: Contact) => (
+                <div key={c._id} className="bg-card border-border rounded-xl border p-4 shadow-sm flex flex-col gap-3">
+                  <div className="flex justify-between items-start">
+                    <div>
+                      <h3 className="font-semibold text-base">{c.name}</h3>
+                      <p className="text-sm text-muted-foreground">{c.email}</p>
+                    </div>
+                    <span className="text-xs text-muted-foreground bg-muted px-2 py-1 rounded-md">
+                      {new Date(c.createdAt).toLocaleDateString()}
+                    </span>
+                  </div>
+                  <div className="text-sm text-foreground bg-muted/30 p-3 rounded-lg truncate">
+                    <span className="font-medium">Sub:</span> {c.subject}
+                  </div>
+                  <div className="flex items-center justify-end gap-3 mt-1 pt-3 border-t">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="text-destructive border-destructive/20 hover:bg-destructive hover:text-destructive-foreground h-9"
+                      onClick={() => handleDeleteContact(c)}
+                    >
+                      <Trash2 className="h-4 w-4 mr-1.5" />
+                      Delete
+                    </Button>
+                    <Button
+                      variant="default"
+                      size="sm"
+                      className="h-9"
+                      onClick={() => setSelectedContact(c)}
+                    >
+                      <Eye className="h-4 w-4 mr-1.5" />
+                      View
+                    </Button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </>
         )}
       </div>
 

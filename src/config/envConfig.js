@@ -1,13 +1,13 @@
-// Function to get the base API URL
+// Uncomment the localhost lines if you are running your backend locally without Cloudflare!
+// export const url = "http://localhost:5000/api/v1";
+// export const pdfUrl = "http://localhost:5000";
+// export const imageUrl = "http://localhost:5000/uploads";
+
 export const url =
-  "https://worldcat-findings-gnu-stud.trycloudflare.com/api/v1/";
+  "https://worldcat-findings-gnu-stud.trycloudflare.com/api/v1";
 export const pdfUrl = "https://worldcat-findings-gnu-stud.trycloudflare.com";
 export const imageUrl =
   "https://worldcat-findings-gnu-stud.trycloudflare.com/uploads";
-
-// export const url = "/api/v1/";
-// export const pdfUrl = "";
-// export const imageUrl = "/uploads";
 
 export const getBaseUrl = () => {
   return url;
