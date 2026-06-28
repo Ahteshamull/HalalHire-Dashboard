@@ -4,12 +4,16 @@ import { UserRatio } from "@/components/UserRatio";
 import { Calendar } from "@/components/ui/calendar";
 import { CountingNumber } from "@/components/ui/CountingNumber";
 import React from "react";
+import { useGetPaymentStatsQuery } from "@/redux/api/earningApi";
 
 const Dashbaord = () => {
   const [date, setDate] = React.useState<Date | undefined>(new Date());
+  
+  const { data: statsResponse } = useGetPaymentStatsQuery({});
+  const stats = statsResponse?.data || { totalUser: 0, totalTransaction: 0, totalPayment: 0 };
   return (
     <div className="px-4 sm:px-0">
-      {/* upper 2 blocks */}
+      {/* upper 3 blocks */}
       <div
         className="bg-sidebar flex w-full items-center justify-center rounded-lg border border-[#E2E8F0] py-4 shadow-sm sm:py-6 dark:border-[#F4B057]"
         style={{ minHeight: "110px" }}
@@ -17,29 +21,43 @@ const Dashbaord = () => {
         <div className="flex flex-1 flex-col items-center justify-center px-2">
           <p className="mb-1 text-xl font-bold text-[#0D2357] sm:mb-2 sm:text-2xl md:text-3xl lg:text-4xl dark:text-white">
             <CountingNumber
-              end={7.8}
-              duration={1000}
-              decimals={1}
-              suffix="k"
-              className="mb-1 text-xl font-bold text-[#0D2357] sm:mb-2 sm:text-2xl md:text-3xl lg:text-4xl dark:text-white"
-            />
-          </p>
-          <span className="text-center text-xs font-medium text-[#0D2357] sm:text-sm md:text-base lg:text-lg dark:text-white">
-            Total Distributor
-          </span>
-        </div>
-        <div className="mx-3 h-12 w-px bg-[#C8A75B] sm:mx-4 sm:h-14 md:mx-6 md:h-16 lg:mx-8" />
-        <div className="flex flex-1 flex-col items-center justify-center px-2">
-          <p className="mb-1 text-xl font-bold text-[#0D2357] sm:mb-2 sm:text-2xl md:text-3xl lg:text-4xl dark:text-white">
-            <CountingNumber
-              end={249}
+              end={stats.totalUser}
               duration={1000}
               decimals={0}
               className="mb-1 text-xl font-bold text-[#0D2357] sm:mb-2 sm:text-2xl md:text-3xl lg:text-4xl dark:text-white"
             />
           </p>
           <span className="text-center text-xs font-medium text-[#0D2357] sm:text-sm md:text-base lg:text-lg dark:text-white">
-            Total Employer
+            Total User
+          </span>
+        </div>
+        <div className="mx-3 h-12 w-px bg-[#C8A75B] sm:mx-4 sm:h-14 md:mx-6 md:h-16 lg:mx-8" />
+        <div className="flex flex-1 flex-col items-center justify-center px-2">
+          <p className="mb-1 text-xl font-bold text-[#0D2357] sm:mb-2 sm:text-2xl md:text-3xl lg:text-4xl dark:text-white">
+            <CountingNumber
+              end={stats.totalTransaction}
+              duration={1000}
+              decimals={0}
+              className="mb-1 text-xl font-bold text-[#0D2357] sm:mb-2 sm:text-2xl md:text-3xl lg:text-4xl dark:text-white"
+            />
+          </p>
+          <span className="text-center text-xs font-medium text-[#0D2357] sm:text-sm md:text-base lg:text-lg dark:text-white">
+            Total Transaction
+          </span>
+        </div>
+        <div className="mx-3 h-12 w-px bg-[#C8A75B] sm:mx-4 sm:h-14 md:mx-6 md:h-16 lg:mx-8" />
+        <div className="flex flex-1 flex-col items-center justify-center px-2">
+          <p className="mb-1 text-xl font-bold text-[#0D2357] sm:mb-2 sm:text-2xl md:text-3xl lg:text-4xl dark:text-white">
+            <CountingNumber
+              end={stats.totalPayment}
+              duration={1000}
+              decimals={2}
+              prefix="$"
+              className="mb-1 text-xl font-bold text-[#0D2357] sm:mb-2 sm:text-2xl md:text-3xl lg:text-4xl dark:text-white"
+            />
+          </p>
+          <span className="text-center text-xs font-medium text-[#0D2357] sm:text-sm md:text-base lg:text-lg dark:text-white">
+            Total Revenue
           </span>
         </div>
       </div>

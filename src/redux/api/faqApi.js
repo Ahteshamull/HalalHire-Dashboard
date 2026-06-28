@@ -25,18 +25,21 @@ const faqApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: ["faq"],
     }),
-    // updateFaq: builder.mutation({
-    //   query: ({ _id, data }) => {
-    //     // console.log("Updating FAQ:", { _id, data });
-    //     return {
-    //       url: `faq/update-faq`,
-    //       method: "PATCH",
-    //       params: { faqId: _id },
-    //       body: data,
-    //     };
-    //   },
-    //   invalidatesTags: ["faq"],
-    // }),
+    getSpecificFaq: builder.query({
+      query: (id) => ({
+        url: `/faq/specificFAQ/${id}`,
+        method: "GET",
+      }),
+      providesTags: ["faq"],
+    }),
+    updateFaq: builder.mutation({
+      query: ({ id, data }) => ({
+        url: `/faq/update_faq/${id}`,
+        method: "PATCH",
+        body: data,
+      }),
+      invalidatesTags: ["faq"],
+    }),
   }),
 });
 
@@ -44,7 +47,8 @@ export const {
   useGetAllFaqQuery,
   useCreateFaqMutation,
   useDeleteFaqMutation,
-  // useUpdateFaqMutation,
+  useGetSpecificFaqQuery,
+  useUpdateFaqMutation,
 } = faqApi;
 
 export default faqApi;

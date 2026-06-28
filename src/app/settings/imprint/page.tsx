@@ -1,18 +1,36 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { ArrowLeft, Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
+import Swal from "sweetalert2";
 import { Button } from "@/components/ui/button";
 import TiptapEditor from "@/components/ui/TiptapEditor";
-import { useCreateImprintMutation } from "@/redux/api/privacyApi";
+import { useCreateImprintMutation, useGetImprintQuery } from "@/redux/api/privacyApi";
 
 export default function ImprintPage() {
   const router = useRouter();
+  const { data: imprintData, isLoading: isFetching } = useGetImprintQuery({});
   const [createImprint, { isLoading }] = useCreateImprintMutation();
-  const [content, setContent] = useState(
-    "<p>We are a dedicated team committed to providing the best service to our customers. Learn more about our mission and values.</p>",
-  );
+  const [content, setContent] = useState("");
+
+  useEffect(() => {
+    if (imprintData?.data) {
+      let data = imprintData.data;
+      if (data.data) {
+        data = data.data; // Unwrap nested data object
+      }
+      data = Array.isArray(data) ? data[0] : data;
+      
+      if (data) {
+        // Find the content regardless of the exact key used by the backend
+        const fetchedContent = data.imprint || data.description || data.content || data.text || Object.values(data).find(v => typeof v === 'string' && v.includes('<p>')) || "";
+        if (fetchedContent) {
+          setContent(fetchedContent as string);
+        }
+      }
+    }
+  }, [imprintData]);
 
   const handleSave = async () => {
     try {
@@ -22,11 +40,21 @@ export default function ImprintPage() {
         },
       }).unwrap();
       
-      alert("Imprint saved successfully!");
+      Swal.fire({
+        title: "Success!",
+        text: "Imprint saved successfully!",
+        icon: "success",
+        confirmButtonColor: "#0D2357",
+      });
     } catch (err: any) {
       console.error("Save Imprint Error:", err);
       const errorMessage = err?.data?.message || "Failed to save Imprint. Please try again.";
-      alert(errorMessage);
+      Swal.fire({
+        title: "Error!",
+        text: errorMessage,
+        icon: "error",
+        confirmButtonColor: "#0D2357",
+      });
     }
   };
 
@@ -44,7 +72,13 @@ export default function ImprintPage() {
 
       {/* Editor */}
       <div className="bg-card p-6">
-        <TiptapEditor content={content} onChange={setContent} placeholder="Write imprint..." />
+        {isFetching ? (
+          <div className="flex justify-center py-12">
+            <Loader2 className="text-primary h-8 w-8 animate-spin" />
+          </div>
+        ) : (
+          <TiptapEditor content={content} onChange={setContent} placeholder="Write imprint..." />
+        )}
       </div>
 
       {/* Footer Actions */}

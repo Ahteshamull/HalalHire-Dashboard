@@ -4,7 +4,7 @@ const termsAndConditionsApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
     getTermsAndConditions: builder.query({
       query: () => ({
-        url: "home/get-terms-condition",
+        url: "setting/find_by_terms_conditions",
         method: "GET",
       }),
       providesTags: ["termsAndConditions"],

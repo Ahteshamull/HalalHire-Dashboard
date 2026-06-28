@@ -1,18 +1,24 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { ArrowLeft, Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
+import Swal from "sweetalert2";
 import { Button } from "@/components/ui/button";
 import TiptapEditor from "@/components/ui/TiptapEditor";
-import { useCreateTermsAndConditionsMutation } from "@/redux/api/termsApi";
+import { useCreateTermsAndConditionsMutation, useGetTermsAndConditionsQuery } from "@/redux/api/termsApi";
 
 export default function TermsConditionsPage() {
   const router = useRouter();
+  const { data: termsData, isLoading: isFetching } = useGetTermsAndConditionsQuery({});
   const [createTermsAndConditions, { isLoading }] = useCreateTermsAndConditionsMutation();
-  const [content, setContent] = useState(
-    "<p>There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration in some form, by injected humour, or randomised words which don't look even slightly believable. If you are going to use a passage of Lorem Ipsum, you need to be sure there isn't anything embarrassing hidden in the middle of text.</p>",
-  );
+  const [content, setContent] = useState("");
+
+  useEffect(() => {
+    if (termsData?.data?.TermsConditions) {
+      setContent(termsData.data.TermsConditions);
+    }
+  }, [termsData]);
 
   const handleSave = async () => {
     try {
@@ -22,11 +28,21 @@ export default function TermsConditionsPage() {
         },
       }).unwrap();
       
-      alert("Terms & Conditions saved successfully!");
+      Swal.fire({
+        title: "Success!",
+        text: "Terms & Conditions saved successfully!",
+        icon: "success",
+        confirmButtonColor: "#0D2357", // Match primary color
+      });
     } catch (err: any) {
       console.error("Save Terms & Conditions Error:", err);
       const errorMessage = err?.data?.message || "Failed to save Terms & Conditions. Please try again.";
-      alert(errorMessage);
+      Swal.fire({
+        title: "Error!",
+        text: errorMessage,
+        icon: "error",
+        confirmButtonColor: "#0D2357",
+      });
     }
   };
 
@@ -44,11 +60,17 @@ export default function TermsConditionsPage() {
 
       {/* Editor */}
       <div className="bg-card p-6">
-        <TiptapEditor
-          content={content}
-          onChange={setContent}
-          placeholder="Write terms and conditions..."
-        />
+        {isFetching ? (
+          <div className="flex justify-center py-12">
+            <Loader2 className="text-primary h-8 w-8 animate-spin" />
+          </div>
+        ) : (
+          <TiptapEditor
+            content={content}
+            onChange={setContent}
+            placeholder="Write terms and conditions..."
+          />
+        )}
       </div>
 
       {/* Footer Actions */}

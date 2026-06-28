@@ -21,9 +21,16 @@ const earningApi = baseApi.injectEndpoints({
       }),
       providesTags: ["earning"],
     }),
+    getPaymentStats: builder.query({
+      query: () => ({
+        url: "payment_gateway/find_by_avg_information",
+        method: "GET",
+      }),
+      providesTags: ["earning"],
+    }),
   }),
 });
 
-export const { useGetEarningQuery, useGetAllPaymentsQuery } = earningApi;
+export const { useGetEarningQuery, useGetAllPaymentsQuery, useGetPaymentStatsQuery } = earningApi;
 
 export default earningApi;

@@ -127,54 +127,67 @@ const AppSidebar = () => {
 
       <SidebarSeparator className="mx-auto w-3/4 max-w-xs" />
 
-      <SidebarContent>
+      <SidebarContent className="px-2">
         <SidebarGroup>
           {/* <SidebarGroupLabel className="text-base font-semibold">Application</SidebarGroupLabel> */}
           <SidebarGroupContent>
-            <SidebarMenu>
-              {items.map((item) => (
-                <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton
-                    asChild
-                    className="h-12 text-base font-medium md:h-16 md:text-lg"
-                    isActive={isActive(item.url)}
-                  >
-                    <Link
-                      href={item.url}
-                      onClick={() => isMobile && setOpenMobile(false)}
-                      className={`flex items-center gap-3 group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:gap-0 md:gap-4 ${isActive(item.url)
-                        ? "bg-sidebar-primary! text-sidebar-primary-foreground"
-                        : "hover:bg-sidebar-primary hover:text-sidebar-primary-foreground"
-                        }`}
+            <SidebarMenu className="gap-2">
+              {items.map((item) => {
+                const active = isActive(item.url);
+                return (
+                  <SidebarMenuItem key={item.title}>
+                    <SidebarMenuButton
+                      asChild
+                      className="h-12 w-full p-0 md:h-14"
+                      isActive={active}
                     >
-                      <item.icon className="h-6 w-6 group-data-[collapsible=icon]:h-9 group-data-[collapsible=icon]:w-9 md:h-7 md:w-7" />
-                      <span className="text-base font-medium md:text-lg">{item.title}</span>
-                    </Link>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
+                      <Link
+                        href={item.url}
+                        onClick={() => isMobile && setOpenMobile(false)}
+                        className={`group relative flex h-full w-full items-center gap-3 overflow-hidden rounded-xl px-4 transition-all duration-300 ease-out group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:px-0 md:gap-4 ${
+                          active
+                            ? "bg-primary/10 text-primary font-semibold shadow-sm"
+                            : "text-muted-foreground hover:bg-muted/80 hover:text-foreground hover:translate-x-1"
+                        }`}
+                      >
+                        {active && (
+                          <div className="absolute left-0 top-1/2 h-8 w-1.5 -translate-y-1/2 rounded-r-full bg-primary" />
+                        )}
+                        <item.icon
+                          className={`h-5 w-5 transition-transform duration-300 group-data-[collapsible=icon]:h-7 group-data-[collapsible=icon]:w-7 md:h-6 md:w-6 ${
+                            active ? "scale-110" : "group-hover:scale-110"
+                          }`}
+                        />
+                        <span className="text-base tracking-wide group-data-[collapsible=icon]:hidden md:text-lg">
+                          {item.title}
+                        </span>
+                      </Link>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                );
+              })}
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
 
       {/* sidebar footer */}
-      <SidebarFooter>
+      <SidebarFooter className="p-4">
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton
-              className="h-12 border-2 border-red-600 text-base font-medium text-red-500 transition-colors hover:border-red-700 hover:bg-red-500 hover:text-white md:h-16 md:text-lg"
-              onClick={() => setLogoutModalOpen(true)}
+              asChild
+              className="h-12 w-full p-0 md:h-14"
             >
-              <div 
-                className="flex items-center gap-3 group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:gap-0 md:gap-4"
-                onClick={() => isMobile && setOpenMobile(false)}
+              <button
+                onClick={() => setLogoutModalOpen(true)}
+                className="group flex h-full w-full items-center justify-center gap-3 rounded-xl border border-destructive/20 bg-destructive/5 px-4 text-destructive transition-all duration-300 ease-out hover:border-destructive hover:bg-destructive hover:text-destructive-foreground hover:shadow-[0_0_15px_rgba(220,38,38,0.3)] group-data-[collapsible=icon]:px-0 md:gap-4"
               >
-                <LogOut className="h-6 w-6 group-data-[collapsible=icon]:h-9 group-data-[collapsible=icon]:w-9 md:h-7 md:w-7" />
-                <span className="text-base font-medium group-data-[collapsible=icon]:hidden md:text-lg">
+                <LogOut className="h-5 w-5 transition-transform duration-300 group-hover:-translate-x-1 group-data-[collapsible=icon]:h-7 group-data-[collapsible=icon]:w-7 md:h-6 md:w-6" />
+                <span className="text-base font-medium tracking-wide group-data-[collapsible=icon]:hidden md:text-lg">
                   Log Out
                 </span>
-              </div>
+              </button>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>

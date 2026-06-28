@@ -4,13 +4,16 @@ import { EarningChart } from "@/components/EarningChart";
 import { CountingNumber } from "@/components/ui/CountingNumber";
 import { useState } from "react";
 import { ChevronLeft, ChevronRight, Loader2 } from "lucide-react";
-import { useGetAllPaymentsQuery } from "@/redux/api/earningApi";
+import { useGetAllPaymentsQuery, useGetPaymentStatsQuery } from "@/redux/api/earningApi";
 
 const Earnings = () => {
-  // These values would come from your API
-  const avgTransaction = 0;
-  const currentMonthRevenue = 0;
-  const totalRevenue = 0;
+  // Fetch stats from API
+  const { data: statsResponse } = useGetPaymentStatsQuery({});
+  const stats = statsResponse?.data || { totalUser: 0, totalTransaction: 0, totalPayment: 0 };
+  
+  const totalRevenue = stats.totalPayment || 0;
+  const totalTransaction = stats.totalTransaction || 0;
+  const avgTransaction = totalTransaction > 0 ? totalRevenue / totalTransaction : 0;
 
   // Pagination and filter state
   const [currentPage, setCurrentPage] = useState(1);
@@ -51,15 +54,14 @@ const Earnings = () => {
         <div className="flex flex-1 flex-col items-center justify-center px-2 py-4 sm:py-0">
           <p className="ipad:text-3xl mb-1 text-xl font-bold text-[#0D2357] max-md:text-xl lg:text-4xl dark:text-white">
             <CountingNumber
-              end={currentMonthRevenue}
+              end={totalTransaction}
               duration={1000}
-              decimals={2}
-              prefix="$"
+              decimals={0}
               className="ipad:text-3xl text-xl font-bold text-[#0D2357] max-md:text-xl lg:text-4xl dark:text-white"
             />
           </p>
           <span className="text-center text-xs font-medium text-[#0D2357] lg:text-lg dark:text-white sm:text-sm">
-            Current Month Revenue
+            Total Transactions
           </span>
         </div>
         <div className="mx-4 h-16 w-px bg-[#F4B057] hidden sm:block" />

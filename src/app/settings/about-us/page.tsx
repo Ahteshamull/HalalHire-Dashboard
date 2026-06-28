@@ -1,18 +1,36 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { ArrowLeft, Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
+import Swal from "sweetalert2";
 import { Button } from "@/components/ui/button";
 import TiptapEditor from "@/components/ui/TiptapEditor";
-import { useCreateAboutUsMutation } from "@/redux/api/privacyApi";
+import { useCreateAboutUsMutation, useGetAboutUsQuery } from "@/redux/api/privacyApi";
 
 export default function AboutUsPage() {
   const router = useRouter();
+  const { data: aboutData, isLoading: isFetching } = useGetAboutUsQuery({});
   const [createAboutUs, { isLoading }] = useCreateAboutUsMutation();
-  const [content, setContent] = useState(
-    "<p>We are a dedicated team committed to providing the best service to our customers. Learn more about our mission and values.</p>",
-  );
+  const [content, setContent] = useState("");
+
+  useEffect(() => {
+    if (aboutData?.data) {
+      let data = aboutData.data;
+      if (data.data) {
+        data = data.data; // Unwrap nested data object
+      }
+      data = Array.isArray(data) ? data[0] : data;
+      
+      if (data) {
+        // Find the content regardless of the exact key used by the backend
+        const fetchedContent = data.aboutUs || data.description || data.content || data.text || Object.values(data).find(v => typeof v === 'string' && v.includes('<p>')) || "";
+        if (fetchedContent) {
+          setContent(fetchedContent as string);
+        }
+      }
+    }
+  }, [aboutData]);
 
   const handleSave = async () => {
     try {
@@ -22,11 +40,21 @@ export default function AboutUsPage() {
         },
       }).unwrap();
       
-      alert("About Us saved successfully!");
+      Swal.fire({
+        title: "Success!",
+        text: "About Us saved successfully!",
+        icon: "success",
+        confirmButtonColor: "#0D2357",
+      });
     } catch (err: any) {
       console.error("Save About Us Error:", err);
       const errorMessage = err?.data?.message || "Failed to save About Us. Please try again.";
-      alert(errorMessage);
+      Swal.fire({
+        title: "Error!",
+        text: errorMessage,
+        icon: "error",
+        confirmButtonColor: "#0D2357",
+      });
     }
   };
 
@@ -44,7 +72,13 @@ export default function AboutUsPage() {
 
       {/* Editor */}
       <div className="bg-card p-6">
-        <TiptapEditor content={content} onChange={setContent} placeholder="Write about us..." />
+        {isFetching ? (
+          <div className="flex justify-center py-12">
+            <Loader2 className="text-primary h-8 w-8 animate-spin" />
+          </div>
+        ) : (
+          <TiptapEditor content={content} onChange={setContent} placeholder="Write about us..." />
+        )}
       </div>
 
       {/* Footer Actions */}

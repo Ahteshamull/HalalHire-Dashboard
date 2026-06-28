@@ -1,18 +1,36 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { ArrowLeft, Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
+import Swal from "sweetalert2";
 import { Button } from "@/components/ui/button";
 import TiptapEditor from "@/components/ui/TiptapEditor";
-import { useCreateAccessibilityMutation } from "@/redux/api/privacyApi";
+import { useCreateAccessibilityMutation, useGetAccessibilityQuery } from "@/redux/api/privacyApi";
 
 export default function AccessibilityPage() {
   const router = useRouter();
+  const { data: accessibilityData, isLoading: isFetching } = useGetAccessibilityQuery({});
   const [createAccessibility, { isLoading }] = useCreateAccessibilityMutation();
-  const [content, setContent] = useState(
-    "<p>We are a dedicated team committed to providing the best service to our customers. Learn more about our mission and values.</p>",
-  );
+  const [content, setContent] = useState("");
+
+  useEffect(() => {
+    if (accessibilityData?.data) {
+      let data = accessibilityData.data;
+      if (data.data) {
+        data = data.data; // Unwrap nested data object
+      }
+      data = Array.isArray(data) ? data[0] : data;
+      
+      if (data) {
+        // Find the content regardless of the exact key used by the backend
+        const fetchedContent = data.accessibility || data.description || data.content || data.text || Object.values(data).find(v => typeof v === 'string' && v.includes('<p>')) || "";
+        if (fetchedContent) {
+          setContent(fetchedContent as string);
+        }
+      }
+    }
+  }, [accessibilityData]);
 
   const handleSave = async () => {
     try {
@@ -22,11 +40,21 @@ export default function AccessibilityPage() {
         },
       }).unwrap();
       
-      alert("Accessibility saved successfully!");
+      Swal.fire({
+        title: "Success!",
+        text: "Accessibility saved successfully!",
+        icon: "success",
+        confirmButtonColor: "#0D2357",
+      });
     } catch (err: any) {
       console.error("Save Accessibility Error:", err);
       const errorMessage = err?.data?.message || "Failed to save Accessibility. Please try again.";
-      alert(errorMessage);
+      Swal.fire({
+        title: "Error!",
+        text: errorMessage,
+        icon: "error",
+        confirmButtonColor: "#0D2357",
+      });
     }
   };
 
@@ -44,7 +72,13 @@ export default function AccessibilityPage() {
 
       {/* Editor */}
       <div className="bg-card p-6">
-        <TiptapEditor content={content} onChange={setContent} placeholder="Write accessibility..." />
+        {isFetching ? (
+          <div className="flex justify-center py-12">
+            <Loader2 className="text-primary h-8 w-8 animate-spin" />
+          </div>
+        ) : (
+          <TiptapEditor content={content} onChange={setContent} placeholder="Write accessibility..." />
+        )}
       </div>
 
       {/* Footer Actions */}

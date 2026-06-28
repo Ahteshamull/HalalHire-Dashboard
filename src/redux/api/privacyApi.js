@@ -25,6 +25,13 @@ const privacyApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: ["privacy"],
     }),
+    getAboutUs: builder.query({
+      query: () => ({
+        url: "/setting/find_by_about_us",
+        method: "GET",
+      }),
+      providesTags: ["privacy"],
+    }),
     createCookiePolicy: builder.mutation({
       query: ({ requestData }) => ({
         url: "/setting/cookie_policy",
@@ -32,6 +39,13 @@ const privacyApi = baseApi.injectEndpoints({
         body: requestData,
       }),
       invalidatesTags: ["privacy"],
+    }),
+    getCookiePolicy: builder.query({
+      query: () => ({
+        url: "/setting/find_by_cookie_policy",
+        method: "GET",
+      }),
+      providesTags: ["privacy"],
     }),
     createAccessibility: builder.mutation({
       query: ({ requestData }) => ({
@@ -49,6 +63,20 @@ const privacyApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: ["privacy"],
     }),
+    getAccessibility: builder.query({
+      query: () => ({
+        url: "/setting/find_by_accessibility",
+        method: "GET",
+      }),
+      providesTags: ["privacy"],
+    }),
+    getImprint: builder.query({
+      query: () => ({
+        url: "/setting/find_by_imprints",
+        method: "GET",
+      }),
+      providesTags: ["privacy"],
+    }),
   }),
 });
 
@@ -56,7 +84,11 @@ export const {
   useGetPrivacyQuery,
   useCreatePrivacyMutation,
   useCreateAboutUsMutation,
+  useGetAboutUsQuery,
   useCreateCookiePolicyMutation,
+  useGetCookiePolicyQuery,
   useCreateAccessibilityMutation,
+  useGetAccessibilityQuery,
   useCreateImprintMutation,
+  useGetImprintQuery,
 } = privacyApi;

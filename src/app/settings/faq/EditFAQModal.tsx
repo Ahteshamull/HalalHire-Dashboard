@@ -5,6 +5,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import TiptapEditor from "@/components/ui/TiptapEditor";
+import { useGetSpecificFaqQuery, useUpdateFaqMutation } from "@/redux/api/faqApi";
 
 type EditFAQModalProps = {
   open: boolean;
@@ -14,6 +15,11 @@ type EditFAQModalProps = {
 };
 
 export default function EditFAQModal({ open, onClose, onConfirm, faq }: EditFAQModalProps) {
+  const { data: faqData, isLoading: isFetching } = useGetSpecificFaqQuery(faq?.id, {
+    skip: !faq?.id || !open,
+  });
+  const [updateFaq, { isLoading: isUpdating }] = useUpdateFaqMutation();
+
   const [question, setQuestion] = useState("");
   const [answer, setAnswer] = useState("");
   const [errors, setErrors] = useState<{
@@ -22,11 +28,15 @@ export default function EditFAQModal({ open, onClose, onConfirm, faq }: EditFAQM
   }>({});
 
   useEffect(() => {
-    if (faq) {
+    const fetchedFaq = faqData?.data?.data || faqData?.data;
+    if (fetchedFaq && fetchedFaq.question) {
+      setQuestion(fetchedFaq.question);
+      setAnswer(fetchedFaq.answer);
+    } else if (faq) {
       setQuestion(faq.question);
       setAnswer(faq.answer);
     }
-  }, [faq]);
+  }, [faq, faqData]);
 
   const validateForm = () => {
     const newErrors: typeof errors = {};
@@ -43,16 +53,27 @@ export default function EditFAQModal({ open, onClose, onConfirm, faq }: EditFAQM
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (validateForm() && faq) {
-      onConfirm({
-        id: faq.id,
-        question,
-        answer,
-      });
-      handleClose();
+      try {
+        await updateFaq({
+          id: faq.id,
+          data: { question, answer },
+        }).unwrap();
+        
+        onConfirm({
+          id: faq.id,
+          question,
+          answer,
+        });
+        handleClose();
+      } catch (err: any) {
+        console.error("Update FAQ Error:", err);
+        const errorMessage = err?.data?.message || "Failed to update FAQ. Please try again.";
+        alert(errorMessage);
+      }
     }
   };
 
@@ -112,8 +133,9 @@ export default function EditFAQModal({ open, onClose, onConfirm, faq }: EditFAQM
             <Button
               type="submit"
               className="bg-primary hover:bg-primary/90 text-primary-foreground flex-1"
+              disabled={isUpdating || isFetching}
             >
-              Update FAQ
+              {isUpdating ? "Updating..." : "Update FAQ"}
             </Button>
           </div>
         </form>
