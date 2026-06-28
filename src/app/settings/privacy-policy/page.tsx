@@ -5,14 +5,17 @@ import { ArrowLeft, Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import TiptapEditor from "@/components/ui/TiptapEditor";
-import { useCreatePrivacyMutation, useGetPrivacyQuery } from "@/redux/api/privacyApi";
+import {
+  useCreatePrivacyMutation,
+  useGetPrivacyQuery,
+} from "@/redux/api/privacyApi";
 import Swal from "sweetalert2";
 
 export default function PrivacyPolicyPage() {
   const router = useRouter();
   const [createPrivacy, { isLoading: isCreating }] = useCreatePrivacyMutation();
   const { data: privacyData, isLoading: isFetching } = useGetPrivacyQuery({});
-  
+
   const [content, setContent] = useState("");
 
   useEffect(() => {
@@ -28,11 +31,13 @@ export default function PrivacyPolicyPage() {
           PrivacyPolicy: content,
         },
       }).unwrap();
-      
+
       Swal.fire("Success", "Privacy Policy saved successfully!", "success");
     } catch (err: any) {
       console.error("Save Privacy Policy Error:", err);
-      const errorMessage = err?.data?.message || "Failed to save Privacy Policy. Please try again.";
+      const errorMessage =
+        err?.data?.message ||
+        "Failed to save Privacy Policy. Please try again.";
       Swal.fire("Error", errorMessage, "error");
     }
   };
@@ -49,7 +54,6 @@ export default function PrivacyPolicyPage() {
         </div>
       </div>
 
-      {/* Editor */}
       <div className="bg-card p-6">
         {isFetching ? (
           <div className="flex h-[300px] items-center justify-center">
