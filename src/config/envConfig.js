@@ -4,10 +4,11 @@
 // export const imageUrl = "http://localhost:5000/uploads";
 
 export const url =
-  "https://worldcat-findings-gnu-stud.trycloudflare.com/api/v1";
-export const pdfUrl = "https://worldcat-findings-gnu-stud.trycloudflare.com";
+  "https://capitol-extensions-cdt-manchester.trycloudflare.com/api/v1";
+export const pdfUrl =
+  "https://capitol-extensions-cdt-manchester.trycloudflare.com";
 export const imageUrl =
-  "https://worldcat-findings-gnu-stud.trycloudflare.com/uploads";
+  "https://capitol-extensions-cdt-manchester.trycloudflare.com/uploads";
 
 export const getBaseUrl = () => {
   return url;
