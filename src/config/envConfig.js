@@ -4,10 +4,11 @@
 // export const imageUrl = "http://localhost:5000/uploads";
 
 export const url =
-  "https://partially-strong-zshops-smile.trycloudflare.com/api/v1";
-export const pdfUrl = "https://partially-strong-zshops-smile.trycloudflare.com";
+  "https://method-episodes-bases-sends.trycloudflare.com/api/v1";
+export const pdfUrl =
+  "https://method-episodes-bases-sends.trycloudflare.com";
 export const imageUrl =
-  "https://partially-strong-zshops-smile.trycloudflare.com/uploads";
+  "https://method-episodes-bases-sends.trycloudflare.com/uploads";
 
 export const getBaseUrl = () => {
   return url;
