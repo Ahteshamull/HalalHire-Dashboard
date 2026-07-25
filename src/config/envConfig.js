@@ -4,11 +4,11 @@
 // export const imageUrl = "http://localhost:5000/uploads";
 
 export const url =
-  "https://method-episodes-bases-sends.trycloudflare.com/api/v1";
+  "https://halal-hire-halalhire5757-tabpmo-d794fd-2-24-82-111.sslip.io/api/v1";
 export const pdfUrl =
-  "https://method-episodes-bases-sends.trycloudflare.com";
+  "https://halal-hire-halalhire5757-tabpmo-d794fd-2-24-82-111.sslip.io";
 export const imageUrl =
-  "https://method-episodes-bases-sends.trycloudflare.com/uploads";
+  "https://halal-hire-halalhire5757-tabpmo-d794fd-2-24-82-111.sslip.io/uploads";
 
 export const getBaseUrl = () => {
   return url;
