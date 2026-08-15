@@ -4,11 +4,11 @@
 // export const imageUrl = "http://localhost:5000/uploads";
 
 export const url =
-  "https://method-episodes-bases-sends.trycloudflare.com/api/v1";
+  "https://method-episodes-bases-sends.trycloudflare.com/api/v1" || "https://yonca-backend.onrender.com/api/v1" ;
 export const pdfUrl =
-  "https://method-episodes-bases-sends.trycloudflare.com";
+  "https://method-episodes-bases-sends.trycloudflare.com" || "https://yonca-backend.onrender.com";
 export const imageUrl =
-  "https://method-episodes-bases-sends.trycloudflare.com/uploads";
+  "https://method-episodes-bases-sends.trycloudflare.com/uploads" || "https://yonca-backend.onrender.com/uploads";
 
 export const getBaseUrl = () => {
   return url;
