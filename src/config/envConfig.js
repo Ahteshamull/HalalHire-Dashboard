@@ -4,11 +4,11 @@
 // export const imageUrl = "http://localhost:5000/uploads";
 
 export const url =
-  "https://halal-hire-halalhire5757-tabpmo-d794fd-2-24-82-111.sslip.io/api/v1";
+  "https://mins-taste-protein-authentic.trycloudflare.com/api/v1";
 export const pdfUrl =
-  "https://halal-hire-halalhire5757-tabpmo-d794fd-2-24-82-111.sslip.io";
+  "https://mins-taste-protein-authentic.trycloudflare.com";
 export const imageUrl =
-  "https://halal-hire-halalhire5757-tabpmo-d794fd-2-24-82-111.sslip.io/uploads";
+  "https://mins-taste-protein-authentic.trycloudflare.com/uploads";
 
 export const getBaseUrl = () => {
   return url;
