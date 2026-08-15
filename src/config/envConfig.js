@@ -4,11 +4,11 @@
 // export const imageUrl = "http://localhost:5000/uploads";
 
 export const url =
-  "https://mins-taste-protein-authentic.trycloudflare.com/api/v1";
+  "https://method-episodes-bases-sends.trycloudflare.com/api/v1";
 export const pdfUrl =
-  "https://mins-taste-protein-authentic.trycloudflare.com";
+  "https://method-episodes-bases-sends.trycloudflare.com";
 export const imageUrl =
-  "https://mins-taste-protein-authentic.trycloudflare.com/uploads";
+  "https://method-episodes-bases-sends.trycloudflare.com/uploads";
 
 export const getBaseUrl = () => {
   return url;
