@@ -19,6 +19,12 @@ const nextConfig: NextConfig = {
         port: "3054",
         pathname: "/**",
       },
+      {
+        protocol: "https",
+        hostname: "yonca-backend.onrender.com",
+        port: "",
+        pathname: "/**",
+      },
     ],
   },
   async rewrites() {

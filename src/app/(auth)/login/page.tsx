@@ -44,6 +44,19 @@ export default function LoginPage() {
     return Object.keys(newErrors).length === 0;
   };
 
+  const decodeJwtPayload = (token: string) => {
+    try {
+      const base64Url = token.split('.')[1];
+      let base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+      while (base64.length % 4) {
+        base64 += '=';
+      }
+      return JSON.parse(atob(base64));
+    } catch {
+      return null;
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -54,11 +67,27 @@ export default function LoginPage() {
         console.log("🔍 Full login response:", response);
         
         // Adjust these based on actual API response structure
-        const userData = response?.data?.user || response?.user;
+        let userData = response?.data?.user || response?.user;
         const accessToken = response?.data?.accessToken || response?.accessToken || response?.token;
         
         console.log("🔍 Extracted user:", userData);
         console.log("🔍 Extracted token:", accessToken);
+
+        // If user object doesn't have role explicitly but token exists, decode token to get role
+        if (!userData?.role && accessToken) {
+          const decoded = decodeJwtPayload(accessToken);
+          if (decoded?.role) {
+            userData = { ...userData, role: decoded.role };
+          } else if (decoded?.user?.role) {
+            userData = { ...userData, role: decoded.user.role };
+          }
+        }
+
+        // Validate that only admin or superAdmin can log in to the dashboard
+        if (userData?.role !== 'admin' && userData?.role !== 'superAdmin') {
+          setErrors({ ...errors, form: "Access Denied: Only Admin or SuperAdmin can access the dashboard." });
+          return;
+        }
 
         if (accessToken) {
           dispatch(setUser({ user: userData, token: accessToken }));
