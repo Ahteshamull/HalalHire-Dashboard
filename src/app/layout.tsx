@@ -29,6 +29,39 @@ export default async function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
+      <head suppressHydrationWarning>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function() {
+                const observer = new MutationObserver((mutations) => {
+                  mutations.forEach((mutation) => {
+                    if (mutation.type === 'attributes' && mutation.attributeName === 'bis_skin_checked') {
+                      mutation.target.removeAttribute('bis_skin_checked');
+                    }
+                    mutation.addedNodes.forEach((node) => {
+                      if (node.nodeType === 1) {
+                        if (node.hasAttribute('bis_skin_checked')) {
+                          node.removeAttribute('bis_skin_checked');
+                        }
+                        node.querySelectorAll('[bis_skin_checked]').forEach((el) => {
+                          el.removeAttribute('bis_skin_checked');
+                        });
+                      }
+                    });
+                  });
+                });
+                observer.observe(document.documentElement, {
+                  childList: true,
+                  subtree: true,
+                  attributes: true,
+                  attributeFilter: ['bis_skin_checked']
+                });
+              })();
+            `
+          }}
+        />
+      </head>
       <body suppressHydrationWarning className={`${poppins.variable} bg-background font-sans antialiased`}>
         <ThemeProvider
           attribute="class"

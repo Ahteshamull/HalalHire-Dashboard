@@ -1,14 +1,14 @@
 // Uncomment the localhost lines if you are running your backend locally without Cloudflare!
-// export const url = "http://localhost:5000/api/v1";
-// export const pdfUrl = "http://localhost:5000";
-// export const imageUrl = "http://localhost:5000/uploads";
+export const url = "http://localhost:3054/api/v1";
+export const pdfUrl = "http://localhost:3054";
+export const imageUrl = "http://localhost:3054/uploads";
 
-export const url =
-  "https://method-episodes-bases-sends.trycloudflare.com/api/v1" || "https://yonca-backend.onrender.com/api/v1" ;
-export const pdfUrl =
-  "https://method-episodes-bases-sends.trycloudflare.com" || "https://yonca-backend.onrender.com";
-export const imageUrl =
-  "https://method-episodes-bases-sends.trycloudflare.com/uploads" || "https://yonca-backend.onrender.com/uploads";
+// export const url =
+//   "https://method-episodes-bases-sends.trycloudflare.com/api/v1" || "https://yonca-backend.onrender.com/api/v1" ;
+// export const pdfUrl =
+//   "https://method-episodes-bases-sends.trycloudflare.com" || "https://yonca-backend.onrender.com";
+// export const imageUrl =
+//   "https://method-episodes-bases-sends.trycloudflare.com/uploads" || "https://yonca-backend.onrender.com/uploads";
 
 export const getBaseUrl = () => {
   return url;

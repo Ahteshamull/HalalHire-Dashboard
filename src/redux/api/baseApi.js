@@ -61,4 +61,14 @@ export const baseApi = createApi({
   ],
 });
 
+// Intercept injectEndpoints to automatically allow overriding existing endpoints in development mode (prevents Next.js hot reload warnings)
+const originalInjectEndpoints = baseApi.injectEndpoints;
+baseApi.injectEndpoints = function (options) {
+  return originalInjectEndpoints.call(this, {
+    ...options,
+    overrideExisting: true,
+  });
+};
+
+
 export { baseApi };
