@@ -237,17 +237,17 @@ export default function AdminsPage() {
   // Mutation for deleting users/admins
   const [deleteUser] = useDeleteUserAccountMutation();
 
-  // Fetch all users using getAllUser endpoint
-  const { data: usersData, isLoading, error } = useGetAllUserQuery({ 
+  // Fetch all users using getAllUser endpoint (useful for other stats maybe)
+  const { data: usersData, isLoading: isUsersLoading, error: usersError } = useGetAllUserQuery({ 
     page: currentPage, 
-    limit: 100 // Get more users to filter locally
+    limit: itemsPerPage
   });
 
-  // Try alternative API call if the first one doesn't work
-  const { data: altUsersData } = useGetSingleUserQuery({ 
-    page: 1, 
-    limit: 100,
-    // Try without userId parameter
+  // Fetch specifically admins
+  const { data: altUsersData, isLoading, error } = useGetSingleUserQuery({ 
+    page: currentPage, 
+    limit: itemsPerPage,
+    role: "admin,superAdmin"
   });
 
   console.log("getAllUser API Response:", usersData);

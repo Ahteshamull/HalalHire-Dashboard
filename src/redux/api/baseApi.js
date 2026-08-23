@@ -8,8 +8,6 @@ export const baseApi = createApi({
   baseQuery: fetchBaseQuery({
     baseUrl: getBaseUrl(),
     prepareHeaders: (headers, { getState }) => {
-
-      headers.set("Content-Type", "application/json");
       
       const token = getState().auth.token;
       console.log("🔍 Token from Redux state:", token);

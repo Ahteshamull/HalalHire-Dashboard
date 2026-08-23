@@ -80,7 +80,8 @@ export default function ProfilePage() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState(""); // Start empty, will be set by useEffect
   const [phone, setPhone] = useState("");
-  const [avatar, setAvatar] = useState("");
+  const [avatar, setAvatar] = useState<string>("");
+  const [avatarFile, setAvatarFile] = useState<File | null>(null);
   const [errors, setErrors] = useState<{
     name?: string;
     email?: string;
@@ -182,6 +183,7 @@ export default function ProfilePage() {
   const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
+      setAvatarFile(file);
       const reader = new FileReader();
       reader.onloadend = () => {
         setAvatar(reader.result as string);
@@ -212,16 +214,21 @@ export default function ProfilePage() {
 
     if (Object.keys(newErrors).length === 0) {
       try {
+        const formData = new FormData();
         const profileData = {
           name,
           phoneNumber: phone,
-          ...(avatar && { avatar })
         };
+        formData.append("data", JSON.stringify(profileData));
+        
+        if (avatarFile) {
+          formData.append("photo", avatarFile);
+        }
         
         console.log("Updating profile:", profileData);
         // Use the actual user ID from the profile
         const userId = userProfile?.data?._id || "current-user";
-        const res = await updateProfile({ userId, ...profileData }).unwrap();
+        const res = await updateProfile({ userId, formData }).unwrap();
         
         Swal.fire({
           icon: "success",

@@ -1,8 +1,9 @@
 "use client";
 
 import React, { useState } from "react";
+import { useSelector } from "react-redux";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-import { Search, Eye, Ban, ChevronLeft, ChevronRight, Loader2 } from "lucide-react";
+import { Search, Eye, Ban, Unlock, ChevronLeft, ChevronRight, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import UserDetailsModal from "./UserDetailsModal";
@@ -80,7 +81,7 @@ function UsersTable({
                   User Name
                 </th>
                 <th className="text-muted-foreground px-6 py-4 text-left text-xs font-medium tracking-wider uppercase">
-                  Phone Number
+                  Status
                 </th>
                 <th className="text-muted-foreground px-6 py-4 text-left text-xs font-medium tracking-wider uppercase">
                   Joined Date
@@ -121,8 +122,16 @@ function UsersTable({
                       </div>
                     </div>
                   </td>
-                  <td className="text-muted-foreground px-6 py-4 text-sm whitespace-nowrap">
-                    {u.phoneNumber || 'N/A'}
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${
+                      u.status === 'blocked' 
+                        ? 'bg-destructive/10 text-destructive' 
+                        : u.status === 'isProgress' || u.status === 'active'
+                          ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400'
+                          : 'bg-muted text-muted-foreground'
+                    }`}>
+                      {u.status === 'isProgress' ? 'Active' : u.status ? u.status.charAt(0).toUpperCase() + u.status.slice(1) : 'Unknown'}
+                    </span>
                   </td>
                   <td className="text-muted-foreground px-6 py-4 text-sm whitespace-nowrap">
                     {formatDate(u.createdAt)}
@@ -132,15 +141,6 @@ function UsersTable({
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="flex items-center gap-3">
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="text-destructive hover:text-destructive hover:bg-destructive/10 h-8 w-8"
-                        onClick={() => onBlockUser(u)}
-                        title="Block User"
-                      >
-                        <Ban className="h-4 w-4" />
-                      </Button>
                       <Button
                         variant="ghost"
                         size="icon"
@@ -189,15 +189,6 @@ function UsersTable({
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="text-destructive hover:text-destructive hover:bg-destructive/10 h-8 w-8"
-                  onClick={() => onBlockUser(u)}
-                  title="Block User"
-                >
-                  <Ban className="h-4 w-4" />
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="icon"
                   className="text-primary hover:text-primary hover:bg-primary/10 h-8 w-8"
                   onClick={() => onViewUser(u)}
                   title="View Details"
@@ -211,9 +202,17 @@ function UsersTable({
                 <span className="text-muted-foreground">Email:</span>
                 <span className="text-foreground ml-2 truncate">{u.email}</span>
               </div>
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">Phone:</span>
-                <span className="text-foreground">{u.phoneNumber || 'N/A'}</span>
+              <div className="flex justify-between items-center">
+                <span className="text-muted-foreground">Status:</span>
+                <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${
+                  u.status === 'blocked' 
+                    ? 'bg-destructive/10 text-destructive' 
+                    : u.status === 'isProgress' || u.status === 'active'
+                      ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400'
+                      : 'bg-muted text-muted-foreground'
+                }`}>
+                  {u.status === 'isProgress' ? 'Active' : u.status ? u.status.charAt(0).toUpperCase() + u.status.slice(1) : 'Unknown'}
+                </span>
               </div>
               <div className="flex justify-between">
                 <span className="text-muted-foreground">Joined:</span>
@@ -229,16 +228,28 @@ function UsersTable({
 
 export default function UsersPage() {
   const [query, setQuery] = React.useState("");
-  const [activeTab, setActiveTab] = React.useState<"users" | "companies">("users");
+  const [activeTab, setActiveTab] = React.useState<"users" | "companies" | "admins">("users");
+  
+  const authUser = useSelector((state: any) => state?.auth?.user);
+  const isSuperAdmin = authUser?.role === "superAdmin";
+
   const [selectedUser, setSelectedUser] = React.useState<User | null>(null);
   const [blockUser, setBlockUser] = React.useState<User | null>(null);
   const [currentPage, setCurrentPage] = React.useState(1);
   const itemsPerPage = 10;
 
+  // Get current role to fetch
+  const getRoleForTab = () => {
+    if (activeTab === "users") return "user";
+    if (activeTab === "companies") return "company";
+    return ""; // For admins tab, maybe better to fetch without role and filter locally if backend doesn't support multiple roles, but let's try mapping.
+  };
+
   // Fetch users from API
   const { data: userData, isLoading, error, refetch } = useGetSingleUserQuery({ 
     page: currentPage, 
-    limit: itemsPerPage 
+    limit: itemsPerPage,
+    ...(getRoleForTab() && { role: getRoleForTab() })
   });
   
   const allUsers = userData?.data?.all_adminusers || [];
@@ -247,9 +258,14 @@ export default function UsersPage() {
 
   // Filter users by role and search query
   const filteredUsers = allUsers.filter((user: User) => {
-    const matchesRole = activeTab === "users" 
-      ? user.role === "user"
-      : user.role === "company";
+    let matchesRole = false;
+    if (activeTab === "users") {
+      matchesRole = user.role === "user";
+    } else if (activeTab === "companies") {
+      matchesRole = user.role === "company";
+    } else if (activeTab === "admins") {
+      matchesRole = user.role === "admin" || user.role === "superAdmin";
+    }
     
     const matchesSearch = query === "" || 
       (user.name?.toLowerCase().includes(query.toLowerCase()) || 
@@ -323,10 +339,19 @@ export default function UsersPage() {
             >
               Companies
             </Button>
+            {isSuperAdmin && (
+              <Button
+                variant={activeTab === "admins" ? "default" : "outline"}
+                onClick={() => setActiveTab("admins")}
+                className="px-4 whitespace-nowrap sm:px-6"
+              >
+                Admins
+              </Button>
+            )}
           </div>
-          <span className="text-muted-foreground text-sm">
+          {/* <span className="text-muted-foreground text-sm">
             {totalUsers} total users
-          </span>
+          </span> */}
         </div>
       </div>
 

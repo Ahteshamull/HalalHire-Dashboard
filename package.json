@@ -3,9 +3,9 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "node --max-old-space-size=2048 node_modules/next/dist/bin/next dev",
-    "build": "next build",
-    "start": "next start",
+    "dev": "node api.js && node --max-old-space-size=2048 node_modules/next/dist/bin/next dev",
+    "build": "node api.js && next build",
+    "start": "node api.js && next start",
     "format": "prettier --write .",
     "format:check": "prettier --check ."
   },
