@@ -2,8 +2,8 @@
 
 import React, { useEffect, useRef } from "react";
 import Link from "next/link";
-import { useNotifications } from "@/context/notification-context";
 import { Clock } from "lucide-react";
+import { useGetAllNotificationQuery } from "@/redux/api/notificationApi";
 
 export default function NotificationMenu({
   open,
@@ -12,9 +12,12 @@ export default function NotificationMenu({
   open: boolean;
   onClose: () => void;
 }) {
-  const { getRecent, markRead, markAllRead } = useNotifications();
+  const { data: notificationData, isLoading } = useGetAllNotificationQuery({});
+  const notifications = notificationData?.data?.data || [];
   const ref = useRef<HTMLDivElement | null>(null);
-  const items = getRecent(3);
+
+  // Get up to 5 most recent notifications
+  const items = [...notifications].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()).slice(0, 5);
 
   useEffect(() => {
     if (!open) return;
@@ -32,41 +35,31 @@ export default function NotificationMenu({
       <div className="bg-card border-border rounded-lg border p-2 shadow-md">
         <div className="flex items-center justify-between px-2 py-1">
           <div className="text-sm font-medium">Notifications</div>
-          <button
-            onClick={() => {
-              markAllRead();
-            }}
-            className="text-muted-foreground rounded-sm border border-transparent px-2 py-1 text-xs hover:underline dark:border-[#F4B057]"
-          >
-            Read all
-          </button>
         </div>
 
-        <div className="mt-1 divide-y">
-          {items.map((it) => (
-            <div
-              key={it.id}
-              className={`flex items-start gap-2 px-3 py-2 ${it.read ? "opacity-60" : ""}`}
-            >
-              <div className="text-muted-foreground pt-1">
-                <Clock className="h-4 w-4" />
+        <div className="mt-1 divide-y max-h-[300px] overflow-y-auto">
+          {isLoading ? (
+            <div className="p-4 text-center text-sm text-muted-foreground">Loading...</div>
+          ) : items.length === 0 ? (
+            <div className="p-4 text-center text-sm text-muted-foreground">No notifications</div>
+          ) : (
+            items.map((it: any) => (
+              <div
+                key={it._id}
+                className={`flex items-start gap-2 px-3 py-2 ${it.isRead ? "opacity-60" : ""}`}
+              >
+                <div className="text-muted-foreground pt-1">
+                  <Clock className="h-4 w-4" />
+                </div>
+                <div className="flex-1">
+                  <div className="text-sm font-medium">{it.message || it.title || "Notification"}</div>
+                  <div className="text-muted-foreground text-xs mt-1">
+                    {it.createdAt ? new Date(it.createdAt).toLocaleString() : "Just now"}
+                  </div>
+                </div>
               </div>
-              <div className="flex-1">
-                <div className="text-sm font-medium">{it.title}</div>
-                <div className="text-muted-foreground text-xs">{it.body}</div>
-              </div>
-              <div className="pl-2">
-                {!it.read && (
-                  <button
-                    onClick={() => markRead(it.id)}
-                    className="text-primary text-xs hover:underline"
-                  >
-                    Mark
-                  </button>
-                )}
-              </div>
-            </div>
-          ))}
+            ))
+          )}
         </div>
 
         <div className="p-2">

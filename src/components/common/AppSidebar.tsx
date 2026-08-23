@@ -80,7 +80,7 @@ const AppSidebar = () => {
 
   return (
     <Sidebar 
-      className="mt-0 ml-0 pb-7 md:mt-4 md:ml-4 md:mb-4 md:rounded-3xl border-none shadow-[0_8px_30px_rgb(0,0,0,0.12)] dark:shadow-[0_8px_30px_rgba(255,255,255,0.03)] bg-background/95 backdrop-blur-3xl overflow-hidden relative z-50 transition-all duration-500 ease-in-out h-[calc(100vh-2rem)]" 
+      className="mt-0 ml-0 pb-7 border-none shadow-[0_8px_30px_rgb(0,0,0,0.12)] dark:shadow-[0_8px_30px_rgba(255,255,255,0.03)] bg-background/95 backdrop-blur-3xl overflow-hidden relative z-50 transition-all duration-500 ease-in-out h-screen" 
       collapsible="icon"
     >
       {/* Decorative background glows */}
@@ -122,7 +122,7 @@ const AppSidebar = () => {
                   <SidebarMenuItem key={item.title} className="group-data-[collapsible=icon]:w-full group-data-[collapsible=icon]:flex group-data-[collapsible=icon]:justify-center">
                     <SidebarMenuButton
                       asChild
-                      className="h-12 w-full p-0 md:h-14 bg-transparent hover:bg-transparent group-data-[collapsible=icon]:!w-10 group-data-[collapsible=icon]:!h-10 group-data-[collapsible=icon]:!p-0"
+                      className="h-12 w-full p-0 md:h-14 bg-transparent hover:bg-transparent hover:text-primary group-data-[collapsible=icon]:!w-10 group-data-[collapsible=icon]:!h-10 group-data-[collapsible=icon]:!p-0"
                       isActive={active}
                     >
                       <Link
