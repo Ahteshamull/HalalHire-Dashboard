@@ -22,12 +22,9 @@ const Navbar = () => {
 
   return (
     <>
-      {/* Yellow top bar */}
-      <div className="bg-background fixed top-0 left-0 z-50 h-3 w-full md:h-5"></div>
-
       {/* Main navbar */}
       <div
-        className={`bg-background/80 backdrop-blur-2xl border border-border/50 fixed top-3 left-2 right-2 z-40 h-[68px] rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.06)] transition-all duration-500 md:top-5 md:mx-5 md:h-[84px] md:rounded-3xl ${sidebarOpen ? "md:left-77" : "md:left-22"}`}
+        className={`bg-background/80 backdrop-blur-2xl border-b border-border/50 fixed top-0 left-0 right-0 z-40 h-[68px] shadow-[0_8px_30px_rgb(0,0,0,0.06)] transition-all duration-500 md:h-[84px] ${sidebarOpen ? "md:left-[18rem]" : "md:left-[4rem]"}`}
       >
         <div className="ml-2 flex h-full w-full items-center justify-between px-2 md:ml-5 md:px-4">
           {/* Left Section */}

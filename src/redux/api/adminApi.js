@@ -8,14 +8,14 @@ export const adminApi = baseApi.injectEndpoints({
         method: "POST",
         body: params, // Use body for POST requests
       }),
-      providesTags: ["user"],
+      invalidatesTags: ["user"],
     }),
     updateUser: builder.mutation({
-      query: ({ userId, ...updateData }) => ({
+      query: ({ userId, formData }) => ({
         url: "/auth/update_my_profile",
         method: "PATCH",
-        params: userId ? { userId } : {}, // Only include userId in params if it exists
-        body: updateData, // Send update data in body for PATCH
+        params: userId ? { userId } : {}, 
+        body: formData, 
       }),
       invalidatesTags: ["user"],
     }),
@@ -29,12 +29,11 @@ export const adminApi = baseApi.injectEndpoints({
     }),
     deleteUser: builder.mutation({
       query: (userId) => ({
-        url: `/dashboard/delete-user/${userId}`,
+        url: `/auth/delete_account/${userId}`,
         method: "DELETE",
       }),
       invalidatesTags: ["user"],
     }),
-    
   }),
 });
 
@@ -42,5 +41,5 @@ export const {
   useCreateAdminMutation,
   useUpdateUserMutation,
   useBlockUserStatusMutation,
-//   useDeleteUserMutation,
+  useDeleteUserMutation,
 } = adminApi;

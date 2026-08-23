@@ -13,13 +13,14 @@ export const userApi = baseApi.injectEndpoints({
       providesTags: ["user"],
     }),
     getSingleUser: builder.query({
-      query: ({ userId, page = 1, limit = 5 }) => ({
+      query: ({ userId, page = 1, limit = 5, role }) => ({
         url: "/auth/find_by_admin_all_users",
         method: "GET",
         params: {
           ...(userId && { userId }),
           page,
           limit,
+          ...(role && { role }),
         },
       }),
       providesTags: ["user"],

@@ -33,9 +33,9 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
   // Otherwise, render with sidebar and navbar
   return (
-    <SidebarProvider defaultOpen={defaultOpen}>
+    <SidebarProvider defaultOpen={defaultOpen} className="h-screen overflow-hidden">
       <AppSidebar />
-      <SidebarInset className="md:ml-5 px-3 md:px-5">
+      <SidebarInset className="px-3 md:px-5 h-full overflow-y-auto">
         <Navbar />
         <div className="">{children}</div>
       </SidebarInset>
